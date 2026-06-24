@@ -175,6 +175,16 @@ export default {
         try {
             const { data } = await this.$axios.get(this.settingsUrl);
             this.form = { ...this.form, ...data };
+
+            // Auto-select the only email field when nothing is saved yet
+            if (this.emailFields.length === 1) {
+                if (!this.form.reply_to_field) {
+                    this.form.reply_to_field = this.emailFields[0].handle;
+                }
+                if (!this.form.confirmation_email_field) {
+                    this.form.confirmation_email_field = this.emailFields[0].handle;
+                }
+            }
         } catch {
             // Keep defaults if load fails
         } finally {
