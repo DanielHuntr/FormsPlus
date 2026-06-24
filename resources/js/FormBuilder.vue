@@ -346,8 +346,6 @@ export default {
         addField(type) {
             const base = {
                 _uid: ++uid,
-                handle: this.uniqueHandle(type.defaults.display),
-                display: type.defaults.display,
                 placeholder: '',
                 instructions: '',
                 required: false,
@@ -359,6 +357,7 @@ export default {
                 rows: 4,
                 input_type: 'text',
                 ...type.defaults,
+                handle: this.uniqueHandle(type.defaults.display),
             };
             this.fields.push(base);
             this.activeIndex = this.fields.length - 1;
