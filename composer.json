@@ -1,5 +1,5 @@
 {
-    "name": "app/forms-plus",
+    "name": "danielhuntr/forms-plus",
     "version": "1.0.0",
     "description": "A drag-and-drop form builder for Statamic",
     "type": "statamic-addon",
