@@ -51,7 +51,6 @@ class SettingsController extends CpController
             'enabled'              => 'boolean',
             'submit_label'         => 'nullable|string|max:100',
             'notification_email'   => 'nullable|email|max:255',
-            'notification_subject' => 'nullable|string|max:255',
             'reply_to_field'       => 'nullable|string|max:255',
             'on_submit'            => 'required|in:message,redirect',
             'success_title'        => 'nullable|string|max:255',

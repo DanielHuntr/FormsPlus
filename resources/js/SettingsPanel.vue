@@ -92,13 +92,6 @@
                     </div>
                 </div>
 
-                <div class="ff-settings__row" v-if="form.notification_email">
-                    <label class="ff-settings__label">Email subject</label>
-                    <div class="ff-settings__control">
-                        <input v-model="form.notification_subject" type="text" class="ff-input" placeholder="New form submission">
-                    </div>
-                </div>
-
                 <div class="ff-settings__row" v-if="form.notification_email && emailFields.length">
                     <label class="ff-settings__label">Reply-to field</label>
                     <div class="ff-settings__control">
@@ -176,7 +169,6 @@ export default {
                 enabled:              true,
                 submit_label:         'Submit',
                 notification_email:   '',
-                notification_subject: 'New form submission',
                 reply_to_field:       '',
                 on_submit:            'message',
                 success_title:        'Message sent!',
