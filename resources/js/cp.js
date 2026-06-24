@@ -8,6 +8,7 @@ import FormEmailTab from './FormEmailTab.vue';
 import EmailTemplateBuilder from './EmailTemplateBuilder.vue';
 import DefaultTemplatesPage from './DefaultTemplatesPage.vue';
 import FormStylesTab from './FormStylesTab.vue';
+import MailSettingsPanel from './MailSettingsPanel.vue';
 
 Statamic.booting(() => {
     Statamic.$components.register('forms-plus-fieldtype', FormsPlusFieldtype);
@@ -19,4 +20,5 @@ Statamic.booting(() => {
     Statamic.$components.register('forms-plus-email-builder', EmailTemplateBuilder);
     Statamic.$components.register('forms-plus-default-templates', DefaultTemplatesPage);
     Statamic.$components.register('forms-plus-styles', FormStylesTab);
+    Statamic.$components.register('forms-plus-mail-settings', MailSettingsPanel);
 });

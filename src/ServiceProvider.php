@@ -48,6 +48,7 @@ class ServiceProvider extends AddonServiceProvider
                     $nav->item('All Forms')->route('forms-plus.index'),
                     $nav->item('Email Templates')->route('forms-plus.email-templates'),
                     $nav->item('Theme')->route('forms-plus.theme'),
+                    $nav->item('Mail Settings')->route('forms-plus.mail-settings'),
                 ]);
         });
 

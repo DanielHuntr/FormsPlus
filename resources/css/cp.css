@@ -865,6 +865,14 @@
     min-height: 520px;
 }
 
+/* ── Mail settings ── */
+.ff-mail__section--disabled { opacity: 0.45; pointer-events: none; }
+.ff-mail__test-row { display: flex; gap: 0.5rem; }
+.ff-mail__test-row .ff-input { flex: 1; }
+.ff-mail__test-msg { font-size: 0.8125rem; margin-top: 0.375rem; }
+.ff-mail__test-msg--ok { color: #16a34a; }
+.ff-mail__test-msg--error { color: #dc2626; }
+
 /* ── Class reference chips ── */
 .fst__class-ref { margin-top: 10px; }
 .fst__class-ref-hint { font-size: 0.6875rem; color: var(--color-grey-40, #9ca3af); margin: 0 0 6px; }

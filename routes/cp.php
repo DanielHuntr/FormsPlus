@@ -2,6 +2,7 @@
 
 use App\FormsPlus\Http\Controllers\EmailTemplateController;
 use App\FormsPlus\Http\Controllers\FormsController;
+use App\FormsPlus\Http\Controllers\MailSettingsController;
 use App\FormsPlus\Http\Controllers\SettingsController;
 use App\FormsPlus\Http\Controllers\StylesController;
 use App\FormsPlus\Http\Controllers\SubmissionsController;
@@ -16,6 +17,11 @@ Route::prefix('forms-plus')->name('forms-plus.')->group(function () {
     Route::get('/email-templates', [EmailTemplateController::class, 'showDefaults'])->name('email-templates');
     Route::get('/email-templates/{type}', [EmailTemplateController::class, 'getTemplate'])->name('email-templates.get');
     Route::post('/email-templates/{type}', [EmailTemplateController::class, 'saveTemplate'])->name('email-templates.save');
+
+    // Mail settings (must be above /{handle} routes)
+    Route::get('/mail-settings', [MailSettingsController::class, 'show'])->name('mail-settings');
+    Route::post('/mail-settings', [MailSettingsController::class, 'save'])->name('mail-settings.save');
+    Route::post('/mail-settings/test', [MailSettingsController::class, 'test'])->name('mail-settings.test');
 
     // Global theme / styles (must be above /{handle} routes)
     Route::get('/theme', [StylesController::class, 'showPage'])->name('theme');

@@ -2,6 +2,8 @@
 
 namespace App\FormsPlus\Listeners;
 
+use App\FormsPlus\Http\Controllers\MailSettingsController;
+use App\FormsPlus\MailSettingsManager;
 use App\FormsPlus\SettingsManager;
 use App\FormsPlus\TemplateManager;
 use App\FormsPlus\TemplateRenderer;
@@ -54,7 +56,8 @@ class HandleFormSubmission
         }
 
         try {
-            Mail::html($html, function ($message) use ($settings, $subject, $replyTo) {
+            $mailer = $this->mailer();
+            $mailer->html($html, function ($message) use ($settings, $subject, $replyTo) {
                 $message->to($settings['notification_email'])->subject($subject);
                 if ($replyTo) {
                     $message->replyTo($replyTo);
@@ -65,6 +68,19 @@ class HandleFormSubmission
         }
     }
 
+    private function mailer(): \Illuminate\Mail\Mailer|\Illuminate\Mail\MailManager
+    {
+        $mailConfig = MailSettingsManager::get();
+
+        if (MailSettingsManager::isConfigured()) {
+            MailSettingsController::configureMailer($mailConfig);
+
+            return Mail::mailer('forms_plus');
+        }
+
+        return Mail::mailer(config('mail.default'));
+    }
+
     private function sendConfirmation(string $handle, array $data, array $vars, string $submitterEmail): void
     {
         $template = TemplateManager::get('confirmation', $handle);
@@ -73,7 +89,8 @@ class HandleFormSubmission
         $subject  = $renderer->interpolateSubject($template['subject'] ?? 'Thank you for your message');
 
         try {
-            Mail::html($html, function ($message) use ($submitterEmail, $subject) {
+            $mailer = $this->mailer();
+            $mailer->html($html, function ($message) use ($submitterEmail, $subject) {
                 $message->to($submitterEmail)->subject($subject);
             });
         } catch (\Throwable $e) {
