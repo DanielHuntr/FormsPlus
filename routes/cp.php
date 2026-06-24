@@ -17,6 +17,11 @@ Route::prefix('forms-plus')->name('forms-plus.')->group(function () {
     Route::get('/email-templates/{type}', [EmailTemplateController::class, 'getTemplate'])->name('email-templates.get');
     Route::post('/email-templates/{type}', [EmailTemplateController::class, 'saveTemplate'])->name('email-templates.save');
 
+    // Global theme / styles (must be above /{handle} routes)
+    Route::get('/theme', [StylesController::class, 'showPage'])->name('theme');
+    Route::get('/theme/api', [StylesController::class, 'show'])->name('styles.api');
+    Route::post('/theme/api', [StylesController::class, 'save'])->name('styles.save');
+
     Route::get('/{handle}/edit', [FormsController::class, 'edit'])->name('edit');
     Route::get('/{handle}/fields', [FormsController::class, 'fields'])->name('fields');
     Route::post('/{handle}/fields', [FormsController::class, 'saveFields'])->name('fields.save');
@@ -28,11 +33,6 @@ Route::prefix('forms-plus')->name('forms-plus.')->group(function () {
 
     Route::get('/{handle}/settings', [SettingsController::class, 'show'])->name('settings');
     Route::post('/{handle}/settings', [SettingsController::class, 'save'])->name('settings.save');
-
-    // Global theme / styles
-    Route::get('/theme', [StylesController::class, 'showPage'])->name('theme');
-    Route::get('/theme/api', [StylesController::class, 'show'])->name('styles.api');
-    Route::post('/theme/api', [StylesController::class, 'save'])->name('styles.save');
 
     // Per-form email templates
     Route::get('/{handle}/email/{type}', [EmailTemplateController::class, 'getFormTemplate'])->name('email.get');

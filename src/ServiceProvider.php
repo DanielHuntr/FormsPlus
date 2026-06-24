@@ -28,6 +28,11 @@ class ServiceProvider extends AddonServiceProvider
         __DIR__.'/../dist/cp.css',
     ];
 
+    protected $routes = [
+        'cp'  => __DIR__.'/../routes/cp.php',
+        'web' => __DIR__.'/../routes/web.php',
+    ];
+
     public function bootAddon(): void
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'forms-plus');
