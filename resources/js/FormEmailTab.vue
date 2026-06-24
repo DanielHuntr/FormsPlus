@@ -19,9 +19,12 @@
                 <strong>Notification email</strong> — sent to the email address configured in Settings when a form is submitted.
             </div>
             <EmailTemplateBuilder
+                ref="notifBuilder"
                 :api-url="emailNotificationUrl"
                 :preview-api-url="emailPreviewUrl"
                 :show-use-default="true"
+                :standalone="standalone"
+                @dirty="$emit('dirty')"
             />
         </div>
 
@@ -31,9 +34,12 @@
                 <strong>Confirmation email</strong> — sent to the person who submitted the form. Configure the recipient field in Settings.
             </div>
             <EmailTemplateBuilder
+                ref="confirmBuilder"
                 :api-url="emailConfirmationUrl"
                 :preview-api-url="emailPreviewUrl"
                 :show-use-default="true"
+                :standalone="standalone"
+                @dirty="$emit('dirty')"
             />
         </div>
     </div>
@@ -49,6 +55,7 @@ export default {
         emailNotificationUrl:  { type: String, required: true },
         emailConfirmationUrl:  { type: String, required: true },
         emailPreviewUrl:       { type: String, required: true },
+        standalone:            { type: Boolean, default: true },
     },
 
     data() {
@@ -59,6 +66,15 @@ export default {
                 { key: 'confirmation',  label: 'Confirmation Email' },
             ],
         };
+    },
+
+    methods: {
+        async save() {
+            await Promise.all([
+                this.$refs.notifBuilder?.save(),
+                this.$refs.confirmBuilder?.save(),
+            ]);
+        },
     },
 };
 </script>

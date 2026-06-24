@@ -121,8 +121,8 @@
                 </div>
             </section>
 
-            <!-- Actions -->
-            <div class="ff-settings__footer">
+            <!-- Actions (hidden when embedded inside FormBuilder) -->
+            <div v-if="standalone" class="ff-settings__footer">
                 <p v-if="saveMessage" class="ff-settings__save-msg" :class="saveError ? 'ff-settings__save-msg--error' : 'ff-settings__save-msg--ok'">
                     {{ saveMessage }}
                 </p>
@@ -140,6 +140,7 @@ export default {
         settingsUrl:     { type: String, required: true },
         settingsSaveUrl: { type: String, required: true },
         fields:          { type: Array, default: () => [] },
+        standalone:      { type: Boolean, default: true },
     },
 
     data() {
@@ -171,6 +172,15 @@ export default {
         },
     },
 
+    watch: {
+        form: {
+            deep: true,
+            handler() {
+                if (this._loaded) this.$emit('dirty');
+            },
+        },
+    },
+
     async mounted() {
         try {
             const { data } = await this.$axios.get(this.settingsUrl);
@@ -190,17 +200,22 @@ export default {
         } finally {
             this.loading = false;
         }
-        this._onSave = (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 's') {
-                e.preventDefault();
-                this.save();
-            }
-        };
-        document.addEventListener('keydown', this._onSave);
+
+        this._loaded = true;
+
+        if (this.standalone) {
+            this._onSave = (e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+                    e.preventDefault();
+                    this.save();
+                }
+            };
+            document.addEventListener('keydown', this._onSave);
+        }
     },
 
     beforeUnmount() {
-        document.removeEventListener('keydown', this._onSave);
+        if (this._onSave) document.removeEventListener('keydown', this._onSave);
     },
 
     methods: {

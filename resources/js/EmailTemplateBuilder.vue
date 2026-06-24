@@ -113,17 +113,17 @@
                         ></div>
                     </div>
 
-                    <!-- Save row -->
+                    <!-- Save row (hidden when embedded in FormBuilder) -->
                     <div class="etb__save-row">
                         <span
-                            v-if="saveMessage"
+                            v-if="saveMessage && standalone"
                             class="etb__save-msg"
                             :class="saveError ? 'etb__save-msg--error' : 'etb__save-msg--ok'"
                         >{{ saveMessage }}</span>
                         <button class="ff-btn ff-btn--ghost" :disabled="previewing" @click="openPreview" style="margin-right:8px">
                             {{ previewing ? 'Loading…' : 'Preview' }}
                         </button>
-                        <button class="ff-btn ff-btn--primary" :disabled="saving" @click="save">
+                        <button v-if="standalone" class="ff-btn ff-btn--primary" :disabled="saving" @click="save">
                             {{ saving ? 'Saving…' : 'Save Template' }}
                         </button>
                     </div>
@@ -424,6 +424,7 @@ export default {
         apiUrl:         { type: String, required: true },
         previewApiUrl:  { type: String, required: true },
         showUseDefault: { type: Boolean, default: false },
+        standalone:     { type: Boolean, default: true },
     },
 
     data() {
@@ -462,6 +463,15 @@ export default {
         },
     },
 
+    watch: {
+        template: {
+            deep: true,
+            handler() {
+                if (this._loaded) this.$emit('dirty');
+            },
+        },
+    },
+
     async mounted() {
         try {
             const { data } = await this.$axios.get(this.apiUrl);
@@ -472,17 +482,22 @@ export default {
         } finally {
             this.loading = false;
         }
-        this._onSave = (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 's') {
-                e.preventDefault();
-                this.save();
-            }
-        };
-        document.addEventListener('keydown', this._onSave);
+
+        this._loaded = true;
+
+        if (this.standalone) {
+            this._onSave = (e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+                    e.preventDefault();
+                    this.save();
+                }
+            };
+            document.addEventListener('keydown', this._onSave);
+        }
     },
 
     beforeUnmount() {
-        document.removeEventListener('keydown', this._onSave);
+        if (this._onSave) document.removeEventListener('keydown', this._onSave);
     },
 
     methods: {

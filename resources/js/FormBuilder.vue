@@ -10,19 +10,20 @@
                 <h1 class="ff-title">{{ form.title }}</h1>
             </div>
             <div class="ff-header__right">
-                <template v-if="currentTab === 'fields'">
-                    <span v-if="saveStatus" class="ff-save-status" :class="saveStatus === 'saved' ? 'ff-save-status--ok' : 'ff-save-status--saving'">
-                        {{ saveStatus === 'saved' ? 'Saved' : 'Saving…' }}
-                    </span>
-                    <button class="ff-btn ff-btn--primary" @click="save" :disabled="saving">
-                        {{ saving ? 'Saving…' : 'Save Form' }}
-                    </button>
-                </template>
-                <template v-else-if="currentTab === 'submissions'">
-                    <a :href="exportUrl" class="ff-btn ff-btn--primary" download>
+                <template v-if="currentTab === 'submissions'">
+                    <a :href="exportUrl" class="ff-btn ff-btn--ghost" download>
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 13 7 8"></polyline><line x1="12" y1="2" x2="12" y2="13"></line></svg>
                         Export CSV
                     </a>
+                </template>
+                <template v-if="currentTab !== 'submissions' && currentTab !== 'preview'">
+                    <span v-if="saveStatus" class="ff-save-status" :class="saveStatus === 'saved' ? 'ff-save-status--ok' : 'ff-save-status--saving'">
+                        {{ saveStatus === 'saved' ? 'Saved' : 'Saving…' }}
+                    </span>
+                    <span v-else-if="isDirty" class="ff-unsaved-indicator">Unsaved changes</span>
+                    <button class="ff-btn ff-btn--primary" @click="saveAll" :disabled="saving">
+                        {{ saving ? 'Saving…' : 'Save' }}
+                    </button>
                 </template>
             </div>
         </header>
@@ -122,20 +123,26 @@
             :export-url="exportUrl"
         />
 
-        <!-- Settings tab -->
+        <!-- Settings tab (v-show keeps data alive when switching tabs) -->
         <SettingsPanel
-            v-if="currentTab === 'settings'"
+            v-show="currentTab === 'settings'"
+            ref="settingsPanel"
             :settings-url="settingsUrl"
             :settings-save-url="settingsSaveUrl"
             :fields="fields"
+            :standalone="false"
+            @dirty="isDirty = true"
         />
 
-        <!-- Email tab -->
+        <!-- Email tab (v-show keeps data alive when switching tabs) -->
         <FormEmailTab
-            v-if="currentTab === 'email'"
+            v-show="currentTab === 'email'"
+            ref="emailTab"
             :email-notification-url="emailNotificationUrl"
             :email-confirmation-url="emailConfirmationUrl"
             :email-preview-url="emailPreviewUrl"
+            :standalone="false"
+            @dirty="isDirty = true"
         />
 
         <!-- Preview tab -->
@@ -266,6 +273,7 @@ export default {
             activeIndex:   null,
             saving:        false,
             saveStatus:    null,
+            isDirty:       false,
             loading:       true,
             fieldTypes:    FIELD_TYPES,
             dragIndex:     null,
@@ -291,19 +299,39 @@ export default {
         },
     },
 
+    watch: {
+        fields: {
+            deep: true,
+            handler() {
+                if (this._fieldsLoaded) this.isDirty = true;
+            },
+        },
+    },
+
     async mounted() {
         await this.loadFields();
+        this._fieldsLoaded = true;
+
         this._onSave = (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 's' && this.currentTab === 'fields') {
+            if ((e.metaKey || e.ctrlKey) && e.key === 's') {
                 e.preventDefault();
-                this.save();
+                this.saveAll();
             }
         };
         document.addEventListener('keydown', this._onSave);
+
+        this._beforeUnload = (e) => {
+            if (this.isDirty) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+        window.addEventListener('beforeunload', this._beforeUnload);
     },
 
     beforeUnmount() {
         document.removeEventListener('keydown', this._onSave);
+        window.removeEventListener('beforeunload', this._beforeUnload);
     },
 
     methods: {
@@ -381,21 +409,28 @@ export default {
             return map[type] ?? type;
         },
 
-        async save() {
+        async saveAll() {
             this.saving     = true;
             this.saveStatus = 'saving';
             try {
-                const { data } = await this.$axios.post(this.saveUrl, { fields: this.fields });
-                if (data.success) {
-                    this.saveStatus = 'saved';
-                    setTimeout(() => { this.saveStatus = null; }, 3000);
-                }
+                await Promise.all([
+                    this.saveFields(),
+                    this.$refs.settingsPanel?.save(),
+                    this.$refs.emailTab?.save(),
+                ]);
+                this.isDirty    = false;
+                this.saveStatus = 'saved';
+                setTimeout(() => { this.saveStatus = null; }, 3000);
             } catch {
-                alert('Save failed. Please try again.');
                 this.saveStatus = null;
             } finally {
                 this.saving = false;
             }
+        },
+
+        async saveFields() {
+            const { data } = await this.$axios.post(this.saveUrl, { fields: this.fields });
+            if (!data.success) throw new Error('Fields save failed');
         },
 
         onDragStart(index) { this.dragIndex = index; },

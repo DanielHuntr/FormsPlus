@@ -153,6 +153,7 @@
 
 /* Save status */
 .ff-save-status { font-size: 0.8125rem; }
+.ff-unsaved-indicator { font-size: 0.8125rem; color: var(--color-grey-50, #6b7280); }
 .ff-save-status--saving { color: var(--color-grey-50, #9ca3af); }
 .ff-save-status--ok { color: #16a34a; }
 
