@@ -121,7 +121,6 @@
 
             <!-- Save -->
             <div class="ff-settings__footer">
-                <p v-if="saveMessage" class="ff-settings__save-msg" :class="saveError ? 'ff-settings__save-msg--error' : 'ff-settings__save-msg--ok'">{{ saveMessage }}</p>
                 <button class="ff-btn ff-btn--primary" :disabled="saving" @click="save">
                     {{ saving ? 'Saving…' : 'Save Settings' }}
                 </button>
@@ -140,11 +139,9 @@ export default {
 
     data() {
         return {
-            loading:     true,
-            saving:      false,
-            saveMessage: '',
-            saveError:   false,
-            testing:     false,
+            loading:  true,
+            saving:   false,
+            testing:  false,
             testEmail:   '',
             testMessage: '',
             testError:   false,
@@ -189,24 +186,14 @@ export default {
 
     methods: {
         async save() {
-            this.saving      = true;
-            this.saveMessage = '';
-            this.saveError   = false;
-
+            this.saving = true;
             try {
-                const { data } = await this.$axios.post(this.saveUrl, this.form);
-                if (data.success) {
-                    this.saveMessage = 'Settings saved.';
-                    if (this.form.password) this.passwordSet = true;
-                    this.form.password = '';
-                    setTimeout(() => { this.saveMessage = ''; }, 3000);
-                } else {
-                    this.saveMessage = data.message || 'Could not save.';
-                    this.saveError   = true;
-                }
+                await this.$axios.post(this.saveUrl, this.form);
+                if (this.form.password) this.passwordSet = true;
+                this.form.password = '';
+                this.$toast.success('Mail settings saved');
             } catch (error) {
-                this.saveMessage = error.response?.data?.message || 'Network error. Please try again.';
-                this.saveError   = true;
+                this.$toast.error(error.response?.data?.message || 'Could not save settings.');
             } finally {
                 this.saving = false;
             }

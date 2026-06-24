@@ -113,14 +113,9 @@
                         ></div>
                     </div>
 
-                    <!-- Save row (hidden when embedded in FormBuilder) -->
+                    <!-- Save row (save button hidden when embedded in FormBuilder) -->
                     <div class="etb__save-row">
-                        <span
-                            v-if="saveMessage && standalone"
-                            class="etb__save-msg"
-                            :class="saveError ? 'etb__save-msg--error' : 'etb__save-msg--ok'"
-                        >{{ saveMessage }}</span>
-                        <button class="ff-btn ff-btn--ghost" :disabled="previewing" @click="openPreview" style="margin-right:8px">
+                        <button class="ff-btn ff-btn--ghost" :disabled="previewing" @click="openPreview">
                             {{ previewing ? 'Loading…' : 'Preview' }}
                         </button>
                         <button v-if="standalone" class="ff-btn ff-btn--primary" :disabled="saving" @click="save">
@@ -429,11 +424,9 @@ export default {
 
     data() {
         return {
-            loading:        true,
-            saving:         false,
-            saveMessage:    '',
-            saveError:      false,
-            useDefault:     true,
+            loading:    true,
+            saving:     false,
+            useDefault: true,
             template:       { subject: '', blocks: [] },
             selectedIndex:  null,
             // preview
@@ -558,27 +551,14 @@ export default {
 
         // ── Save ───────────────────────────────────────────────────────────
         async save() {
-            this.saving      = true;
-            this.saveMessage = '';
-            this.saveError   = false;
-
+            this.saving = true;
             const body = { template: this.template };
-            if (this.showUseDefault) {
-                body.use_default = this.useDefault;
-            }
-
+            if (this.showUseDefault) body.use_default = this.useDefault;
             try {
-                const { data } = await this.$axios.post(this.apiUrl, body);
-                if (data.success) {
-                    this.saveMessage = 'Template saved.';
-                    setTimeout(() => { this.saveMessage = ''; }, 3000);
-                } else {
-                    this.saveMessage = data.message || 'Could not save.';
-                    this.saveError   = true;
-                }
-            } catch (error) {
-                this.saveMessage = error.response?.data?.message || 'Network error. Please try again.';
-                this.saveError   = true;
+                await this.$axios.post(this.apiUrl, body);
+            } catch {
+                this.$toast.error('Could not save template.');
+                throw new Error('template save failed');
             } finally {
                 this.saving = false;
             }

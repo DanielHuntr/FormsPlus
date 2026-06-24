@@ -123,9 +123,6 @@
 
             <!-- Actions (hidden when embedded inside FormBuilder) -->
             <div v-if="standalone" class="ff-settings__footer">
-                <p v-if="saveMessage" class="ff-settings__save-msg" :class="saveError ? 'ff-settings__save-msg--error' : 'ff-settings__save-msg--ok'">
-                    {{ saveMessage }}
-                </p>
                 <button type="submit" class="ff-btn ff-btn--primary" :disabled="saving">
                     {{ saving ? 'Saving…' : 'Save Settings' }}
                 </button>
@@ -145,10 +142,8 @@ export default {
 
     data() {
         return {
-            loading:     true,
-            saving:      false,
-            saveMessage: '',
-            saveError:   false,
+            loading: true,
+            saving:  false,
             form: {
                 enabled:              true,
                 submit_label:         'Submit',
@@ -220,22 +215,12 @@ export default {
 
     methods: {
         async save() {
-            this.saving      = true;
-            this.saveMessage = '';
-            this.saveError   = false;
-
+            this.saving = true;
             try {
-                const { data } = await this.$axios.post(this.settingsSaveUrl, this.form);
-                if (data.success) {
-                    this.saveMessage = 'Settings saved.';
-                    setTimeout(() => { this.saveMessage = ''; }, 3000);
-                } else {
-                    this.saveMessage = data.message || 'Could not save settings.';
-                    this.saveError   = true;
-                }
-            } catch (error) {
-                this.saveMessage = error.response?.data?.message || 'Network error. Please try again.';
-                this.saveError   = true;
+                await this.$axios.post(this.settingsSaveUrl, this.form);
+            } catch {
+                this.$toast.error('Could not save settings.');
+                throw new Error('settings save failed');
             } finally {
                 this.saving = false;
             }

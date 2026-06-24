@@ -86,7 +86,6 @@
 
                     <!-- Save -->
                     <div class="fst__save-row">
-                        <span v-if="saveMessage" class="fst__save-msg" :class="saveError ? 'fst__save-msg--error' : 'fst__save-msg--ok'">{{ saveMessage }}</span>
                         <button class="ff-btn ff-btn--primary" :disabled="saving" @click="save">
                             {{ saving ? 'Saving…' : 'Save Styles' }}
                         </button>
@@ -244,9 +243,7 @@ export default {
     data() {
         return {
             loading:      true,
-            saving:       false,
-            saveMessage:  '',
-            saveError:    false,
+            saving: false,
             previewMode:  'light',
             previewHtml:  '',
             styles: {
@@ -436,22 +433,12 @@ ${formHtml}
         },
 
         async save() {
-            this.saving      = true;
-            this.saveMessage = '';
-            this.saveError   = false;
-
+            this.saving = true;
             try {
-                const { data } = await this.$axios.post(this.stylesSaveUrl, this.styles);
-                if (data.success) {
-                    this.saveMessage = 'Styles saved.';
-                    setTimeout(() => { this.saveMessage = ''; }, 3000);
-                } else {
-                    this.saveMessage = data.message || 'Could not save.';
-                    this.saveError   = true;
-                }
-            } catch (error) {
-                this.saveMessage = error.response?.data?.message || 'Network error. Please try again.';
-                this.saveError   = true;
+                await this.$axios.post(this.stylesSaveUrl, this.styles);
+                this.$toast.success('Styles saved');
+            } catch {
+                this.$toast.error('Could not save styles.');
             } finally {
                 this.saving = false;
             }

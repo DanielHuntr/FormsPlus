@@ -17,10 +17,7 @@
                     </a>
                 </template>
                 <template v-if="currentTab !== 'submissions' && currentTab !== 'preview'">
-                    <span v-if="saveStatus" class="ff-save-status" :class="saveStatus === 'saved' ? 'ff-save-status--ok' : 'ff-save-status--saving'">
-                        {{ saveStatus === 'saved' ? 'Saved' : 'Saving…' }}
-                    </span>
-                    <span v-else-if="isDirty" class="ff-unsaved-indicator">Unsaved changes</span>
+                    <span v-if="isDirty" class="ff-unsaved-indicator">Unsaved changes</span>
                     <button class="ff-btn ff-btn--primary" @click="saveAll" :disabled="saving">
                         {{ saving ? 'Saving…' : 'Save' }}
                     </button>
@@ -272,7 +269,6 @@ export default {
             fields:        [],
             activeIndex:   null,
             saving:        false,
-            saveStatus:    null,
             isDirty:       false,
             loading:       true,
             fieldTypes:    FIELD_TYPES,
@@ -410,19 +406,17 @@ export default {
         },
 
         async saveAll() {
-            this.saving     = true;
-            this.saveStatus = 'saving';
+            this.saving = true;
             try {
                 await Promise.all([
                     this.saveFields(),
                     this.$refs.settingsPanel?.save(),
                     this.$refs.emailTab?.save(),
                 ]);
-                this.isDirty    = false;
-                this.saveStatus = 'saved';
-                setTimeout(() => { this.saveStatus = null; }, 3000);
+                this.isDirty = false;
+                this.$toast.success('Saved');
             } catch {
-                this.saveStatus = null;
+                this.$toast.error('Save failed. Please try again.');
             } finally {
                 this.saving = false;
             }
