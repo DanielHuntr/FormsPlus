@@ -8,6 +8,7 @@ use App\FormsPlus\Tags\FormsPlus;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\FormSubmitted;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Form;
 use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
@@ -49,5 +50,70 @@ class ServiceProvider extends AddonServiceProvider
                     $nav->item('Theme')->route('forms-plus.theme'),
                 ]);
         });
+
+        $this->createDemoFormIfNeeded();
+    }
+
+    private function createDemoFormIfNeeded(): void
+    {
+        if (app()->runningInConsole() || Form::find('contact')) {
+            return;
+        }
+
+        $form = Form::make('contact')->title('Contact Us');
+        $form->save();
+
+        $form->blueprint()->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [[
+                        'fields' => [
+                            [
+                                'handle' => 'name',
+                                'field' => [
+                                    'type'       => 'text',
+                                    'display'    => 'Full Name',
+                                    'input_type' => 'text',
+                                    'placeholder' => 'Jane Smith',
+                                    'validate'   => ['required'],
+                                    'width'      => 100,
+                                ],
+                            ],
+                            [
+                                'handle' => 'email',
+                                'field' => [
+                                    'type'       => 'text',
+                                    'display'    => 'Email Address',
+                                    'input_type' => 'email',
+                                    'placeholder' => 'jane@example.com',
+                                    'validate'   => ['required'],
+                                    'width'      => 50,
+                                ],
+                            ],
+                            [
+                                'handle' => 'phone',
+                                'field' => [
+                                    'type'       => 'text',
+                                    'display'    => 'Phone Number',
+                                    'input_type' => 'tel',
+                                    'placeholder' => '+1 555 000 0000',
+                                    'width'      => 50,
+                                ],
+                            ],
+                            [
+                                'handle' => 'message',
+                                'field' => [
+                                    'type'     => 'textarea',
+                                    'display'  => 'Message',
+                                    'validate' => ['required'],
+                                    'rows'     => 5,
+                                    'width'    => 100,
+                                ],
+                            ],
+                        ],
+                    ]],
+                ],
+            ],
+        ])->save();
     }
 }
