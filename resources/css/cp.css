@@ -955,3 +955,174 @@
     white-space: nowrap;
 }
 .fst__class-chip:hover { background: #e0e7ff; border-color: #c7d2fe; }
+
+/* ============================================================
+   Dark mode — .dark is added to <html> by Statamic
+   Zinc palette: 950=#18181b 800=#27272a 700=#3f3f46 600=#52525b
+                 500=#71717a 400=#a1a1aa 300=#d4d4d8 50=#fafafa
+   ============================================================ */
+
+/* ── Base text ── */
+.dark .ff-title { color: #fafafa; }
+.dark .ff-subtitle { color: #a1a1aa; }
+.dark .ff-label { color: #d4d4d8; }
+.dark .ff-hint { color: #71717a; }
+.dark .ff-code { background: #3f3f46; color: #d4d4d8; }
+.dark .ff-unsaved-indicator { color: #71717a; }
+
+/* ── Buttons ── */
+.dark .ff-btn--ghost { border-color: #3f3f46; color: #d4d4d8; }
+.dark .ff-btn--ghost:hover:not(:disabled) { background: #3f3f46; }
+.dark .ff-btn--danger { border-color: #7f1d1d; color: #fca5a5; }
+.dark .ff-btn--danger:hover:not(:disabled) { background: #450a0a; }
+
+/* ── Inputs ── */
+.dark .ff-input { background: #27272a; border-color: #3f3f46; color: #fafafa; }
+.dark .ff-input::placeholder { color: #52525b; }
+.dark .ff-input:focus { border-color: #60a5fa; }
+.dark .ff-width-btn { background: #27272a; border-color: #3f3f46; color: #d4d4d8; }
+
+/* ── Table / card ── */
+.dark .ff-card { background: #27272a; border-color: #3f3f46; }
+.dark .ff-table th { border-color: #3f3f46; color: #71717a; }
+.dark .ff-table td { border-color: #3f3f46; color: #d4d4d8; }
+.dark .ff-table tr:hover td { background: #3f3f46; }
+.dark .ff-table__title { color: #fafafa; }
+
+/* ── Modal ── */
+.dark .ff-modal { background: #27272a; }
+.dark .ff-modal__header { border-color: #3f3f46; }
+.dark .ff-modal__title { color: #fafafa; }
+.dark .ff-modal__close:hover { background: #3f3f46; color: #d4d4d8; }
+
+/* ── Tab bar ── */
+.dark .ff-tabs { border-color: #3f3f46; }
+.dark .ff-tab { color: #71717a; }
+.dark .ff-tab:hover { color: #d4d4d8; }
+.dark .ff-tab--active { color: #60a5fa; border-bottom-color: #60a5fa; }
+
+/* ── Form builder palette ── */
+.dark .ff-palette { background: #27272a; border-color: #3f3f46; box-shadow: none; }
+.dark .ff-palette__item { color: #d4d4d8; }
+.dark .ff-palette__item:hover { background: #3f3f46; border-color: #52525b; }
+.dark .ff-palette__hint { border-color: #3f3f46; }
+.dark .ff-palette__code { background: #3f3f46; color: #d4d4d8; }
+
+/* ── Canvas ── */
+.dark .ff-canvas { background: #18181b; border-color: #3f3f46; }
+.dark .ff-canvas__empty { color: #52525b; }
+
+/* ── Field rows ── */
+.dark .ff-field-row { background: #27272a; border-color: #3f3f46; box-shadow: none; }
+.dark .ff-field-row:hover { border-color: #60a5fa; box-shadow: 0 2px 6px rgba(96,165,250,.1); }
+.dark .ff-field-row--dragover { background: #1e2a3a; }
+.dark .ff-field-row__label { color: #d4d4d8; }
+.dark .ff-field-row__handle { color: #52525b; }
+.dark .ff-field-row__action { color: #52525b; }
+.dark .ff-field-row__action:hover { color: #a1a1aa; background: #3f3f46; }
+.dark .ff-field-row__type-badge { background: #1e3a5f; color: #60a5fa; }
+
+/* ── Field editor panel ── */
+.dark .ff-editor { background: #27272a; border-color: #3f3f46; box-shadow: none; }
+.dark .ff-editor__header { background: #27272a; border-color: #3f3f46; }
+.dark .ff-editor__title { color: #fafafa; }
+.dark .ff-editor__close:hover { background: #3f3f46; color: #d4d4d8; }
+
+/* ── Settings sections ── */
+.dark .ff-settings__section { background: #27272a; border-color: #3f3f46; box-shadow: none; }
+.dark .ff-settings__section-title { color: #71717a; border-color: #3f3f46; }
+.dark .ff-settings__row { border-color: #3f3f46; }
+.dark .ff-settings__label { color: #d4d4d8; }
+.dark .ff-settings__radio-label { color: #d4d4d8; }
+.dark .ff-settings__footer { border-color: #3f3f46; }
+
+/* ── Submissions ── */
+.dark .ff-submissions__toolbar { border-color: #3f3f46; }
+
+/* ── ETB palette ── */
+.dark .etb__palette { background: #1c1c1f; border-right-color: #3f3f46; }
+.dark .etb__palette-item { color: #d4d4d8; }
+.dark .etb__palette-item:hover { background: #3f3f46; }
+.dark .etb__palette-section-title { color: #71717a; }
+.dark .etb__var-code { background: #312e81; color: #a5b4fc; }
+.dark .etb__var-code:hover { background: #3730a3; }
+.dark .etb__var-desc { color: #71717a; }
+
+/* ── ETB canvas ── */
+.dark .etb__canvas { background: #18181b; }
+.dark .etb__canvas-empty { border-color: #3f3f46; color: #52525b; }
+.dark .etb__drop-zone--active { background: #1e2a3a; border-color: #3b82f6; }
+
+/* ── ETB blocks ── */
+.dark .etb__block { background: #27272a; border-color: #3f3f46; box-shadow: none; }
+.dark .etb__block:hover { border-color: #60a5fa; }
+.dark .etb__block--selected { border-color: #3b82f6; box-shadow: 0 0 0 2px #1e3a5f; }
+.dark .etb__block-handle { color: #52525b; }
+.dark .etb__block-type-badge { background: #3f3f46; color: #a1a1aa; }
+.dark .etb__block-excerpt { color: #71717a; }
+.dark .etb__block-del { color: #52525b; }
+.dark .etb__block-del:hover { color: #fca5a5; background: #450a0a; }
+
+/* ── ETB subject input ── */
+.dark .etb__subject-label { color: #71717a; }
+
+/* ── ETB editor panel ── */
+.dark .etb__editor { background: #27272a; border-left-color: #3f3f46; }
+.dark .etb__editor-header { background: #27272a; border-color: #3f3f46; }
+.dark .etb__editor-title { color: #71717a; }
+.dark .etb__editor-close:hover { background: #3f3f46; color: #d4d4d8; }
+.dark .etb__editor-empty { color: #52525b; }
+.dark .etb__field { border-color: #3f3f46; }
+.dark .etb__field-label { color: #a1a1aa; }
+.dark .etb__color-swatch { border-color: #3f3f46; }
+.dark .etb__using-default-info { color: #71717a; }
+.dark .etb__save-row { border-color: #3f3f46; }
+
+/* ── ETB use-default bar ── */
+.dark .etb__use-default-bar { background: #18181b; border-color: #3f3f46; }
+.dark .etb__use-default-label { color: #d4d4d8; }
+
+/* ── Email sub-tabs ── */
+.dark .ff-email-tab__subtabs { background: #27272a; border-color: #3f3f46; }
+.dark .ff-email-tab__subtab { color: #71717a; }
+.dark .ff-email-tab__subtab:hover { color: #d4d4d8; }
+.dark .ff-email-tab__subtab--active { color: #60a5fa; border-bottom-color: #60a5fa; }
+.dark .ff-email-tab__type-desc { background: #18181b; border-color: #3f3f46; color: #71717a; }
+.dark .ff-email-defaults__desc { border-color: #3f3f46; color: #71717a; }
+
+/* ── ETB preview modal ── */
+.dark .etb__preview-modal { background: #27272a; }
+.dark .etb__preview-header { background: #27272a; border-color: #3f3f46; }
+.dark .etb__preview-title { color: #fafafa; }
+.dark .etb__preview-close { color: #71717a; }
+.dark .etb__preview-close:hover { background: #3f3f46; }
+
+/* ── Styles tab (fst) ── */
+.dark .fst__sidebar { border-color: #3f3f46; }
+.dark .fst__group-title { color: #71717a; border-color: #3f3f46; }
+.dark .fst__label { color: #a1a1aa; }
+.dark .fst__input { background: #27272a; border-color: #3f3f46; color: #fafafa; }
+.dark .fst__input::placeholder { color: #52525b; }
+.dark .fst__input:focus { border-color: #60a5fa; box-shadow: 0 0 0 2px #1e3a5f; }
+.dark .fst__textarea { background: #27272a; border-color: #3f3f46; color: #fafafa; }
+.dark .fst__textarea:focus { border-color: #60a5fa; box-shadow: 0 0 0 2px #1e3a5f; }
+.dark .fst__hint { color: #71717a; }
+.dark .fst__hint code { background: #3f3f46; color: #d4d4d8; }
+.dark .fst__preset-btn { background: #27272a; border-color: #3f3f46; color: #d4d4d8; }
+.dark .fst__save-row { border-color: #3f3f46; }
+.dark .fst__preview-pane { background: #18181b; }
+.dark .fst__preview-header { background: #27272a; border-color: #3f3f46; }
+.dark .fst__preview-title { color: #a1a1aa; }
+.dark .fst__mode-toggle { border-color: #3f3f46; }
+.dark .fst__mode-btn { color: #71717a; }
+.dark .fst__mode-btn:hover { background: #3f3f46; color: #d4d4d8; }
+.dark .fst__mode-btn--active { background: #fafafa; color: #18181b; }
+.dark .fst__mode-btn--active:hover { background: #fafafa; color: #18181b; }
+
+/* ── Class ref chips ── */
+.dark .fst__class-chip { background: #27272a; border-color: #3f3f46; color: #818cf8; }
+.dark .fst__class-chip:hover { background: #312e81; border-color: #4338ca; }
+
+/* ── Mail settings ── */
+.dark .ff-mail__test-msg--ok { color: #4ade80; }
+.dark .ff-mail__test-msg--error { color: #fca5a5; }
