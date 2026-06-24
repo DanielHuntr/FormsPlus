@@ -251,7 +251,7 @@ export default {
 
     async mounted() {
         try {
-            const { data } = await window.axios.get(this.stylesUrl);
+            const { data } = await this.$axios.get(this.stylesUrl);
             this.styles = { ...this.styles, ...data };
         } catch {
             //
@@ -381,7 +381,7 @@ ${formHtml}
             this.saveError   = false;
 
             try {
-                const { data } = await window.axios.post(this.stylesSaveUrl, this.styles);
+                const { data } = await this.$axios.post(this.stylesSaveUrl, this.styles);
                 if (data.success) {
                     this.saveMessage = 'Styles saved.';
                     setTimeout(() => { this.saveMessage = ''; }, 3000);

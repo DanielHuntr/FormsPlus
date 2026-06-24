@@ -36,7 +36,7 @@ export default {
             const url = typeof this.cp_url === 'function'
                 ? this.cp_url('forms-plus/list')
                 : '/cp/forms-plus/list';
-            const { data } = await window.axios.get(url);
+            const { data } = await this.$axios.get(url);
             this.forms = data;
         } catch {
             //

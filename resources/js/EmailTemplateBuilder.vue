@@ -437,7 +437,7 @@ export default {
 
     async mounted() {
         try {
-            const { data } = await window.axios.get(this.apiUrl);
+            const { data } = await this.$axios.get(this.apiUrl);
             this.template   = data.template ?? { subject: '', blocks: [] };
             this.useDefault = data.use_default !== undefined ? !!data.use_default : false;
         } catch {
@@ -515,7 +515,7 @@ export default {
             }
 
             try {
-                const { data } = await window.axios.post(this.apiUrl, body);
+                const { data } = await this.$axios.post(this.apiUrl, body);
                 if (data.success) {
                     this.saveMessage = 'Template saved.';
                     setTimeout(() => { this.saveMessage = ''; }, 3000);

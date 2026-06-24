@@ -83,7 +83,7 @@ export default {
             this.loading   = true;
             this.loadError = false;
             try {
-                const { data } = await window.axios.get(this.submissionsUrl);
+                const { data } = await this.$axios.get(this.submissionsUrl);
                 this.submissions = data.submissions ?? [];
                 this.columns     = data.columns ?? [];
             } catch {
@@ -97,7 +97,7 @@ export default {
             if (! confirm(`Delete this submission from ${sub.date}? This cannot be undone.`)) return;
             try {
                 const url = this.submissionsUrl.replace(/\/submissions$/, `/submissions/${sub.id}`);
-                await window.axios.delete(url);
+                await this.$axios.delete(url);
                 this.submissions = this.submissions.filter(s => s.id !== sub.id);
             } catch {
                 alert('Failed to delete. Please try again.');

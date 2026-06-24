@@ -261,7 +261,7 @@ export default {
         async loadFields() {
             this.loading = true;
             try {
-                const { data } = await window.axios.get(this.fieldsUrl);
+                const { data } = await this.$axios.get(this.fieldsUrl);
                 this.fields = data.map(f => ({ ...f, _uid: ++uid }));
             } catch {
                 console.error('Failed to load fields.');
@@ -336,7 +336,7 @@ export default {
             this.saving     = true;
             this.saveStatus = 'saving';
             try {
-                const { data } = await window.axios.post(this.saveUrl, { fields: this.fields });
+                const { data } = await this.$axios.post(this.saveUrl, { fields: this.fields });
                 if (data.success) {
                     this.saveStatus = 'saved';
                     setTimeout(() => { this.saveStatus = null; }, 3000);

@@ -126,7 +126,7 @@ export default {
             this.creating = true;
             this.createError = '';
             try {
-                const { data } = await window.axios.post(this.storeUrl, {
+                const { data } = await this.$axios.post(this.storeUrl, {
                     title: this.newTitle,
                     handle: this.newHandle,
                 });
@@ -143,7 +143,7 @@ export default {
         async deleteForm(form) {
             if (!confirm(`Delete "${form.title}"? This cannot be undone.`)) return;
             try {
-                await window.axios.delete(form.delete_url);
+                await this.$axios.delete(form.delete_url);
                 this.forms = this.forms.filter(f => f.handle !== form.handle);
             } catch {
                 alert('Failed to delete form. Please try again.');

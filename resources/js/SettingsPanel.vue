@@ -198,7 +198,7 @@ export default {
 
     async mounted() {
         try {
-            const { data } = await window.axios.get(this.settingsUrl);
+            const { data } = await this.$axios.get(this.settingsUrl);
             this.linkMeta = data.redirect_url_meta ?? {};
             const { redirect_url_meta, ...formData } = data;
             this.form = { ...this.form, ...formData };
@@ -216,7 +216,7 @@ export default {
             this.saveError   = false;
 
             try {
-                const { data } = await window.axios.post(this.settingsSaveUrl, this.form);
+                const { data } = await this.$axios.post(this.settingsSaveUrl, this.form);
                 if (data.success) {
                     this.saveMessage = 'Settings saved.';
                     setTimeout(() => { this.saveMessage = ''; }, 3000);
