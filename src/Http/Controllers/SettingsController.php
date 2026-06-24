@@ -5,7 +5,6 @@ namespace App\FormsPlus\Http\Controllers;
 use App\FormsPlus\SettingsManager;
 use Illuminate\Http\Request;
 use Statamic\Facades\Form;
-use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
 
 class SettingsController extends CpController
@@ -18,25 +17,7 @@ class SettingsController extends CpController
             return response()->json(['error' => 'Form not found.'], 404);
         }
 
-        $settings = SettingsManager::get($handle);
-
-        // Attach the link fieldtype meta so the Vue component can hydrate
-        // the picker (e.g. show the entry title when an entry:: value is stored)
-        $settings['redirect_url_meta'] = $this->linkMeta($settings['redirect_url'] ?? null);
-
-        return response()->json($settings);
-    }
-
-    private function linkMeta(?string $value): array
-    {
-        $field = new Field('redirect_url', [
-            'type'        => 'link',
-            'collections' => [],
-        ]);
-
-        $field->setValue($value ?: null);
-
-        return $field->fieldtype()->preload();
+        return response()->json(SettingsManager::get($handle));
     }
 
     public function save(Request $request, string $handle)

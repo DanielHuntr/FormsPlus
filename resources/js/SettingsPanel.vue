@@ -60,21 +60,12 @@
                     </div>
                 </template>
 
-                <template v-if="form.on_submit === 'redirect' && linkMeta !== null">
+                <template v-if="form.on_submit === 'redirect'">
                     <div class="ff-settings__row">
                         <label class="ff-settings__label">Redirect to</label>
                         <div class="ff-settings__control">
-                            <!-- Use Statamic's own link fieldtype for page/URL picking -->
-                            <component
-                                :is="'link-fieldtype'"
-                                :value="form.redirect_url"
-                                :meta="linkMeta"
-                                :config="linkConfig"
-                                handle="redirect_url"
-                                name="redirect_url"
-                                @input="form.redirect_url = $event"
-                            />
-                            <p class="ff-hint">Pick an internal entry or type a URL (e.g. <code>/thank-you</code>).</p>
+                            <input v-model="form.redirect_url" type="text" class="ff-input" placeholder="/thank-you">
+                            <p class="ff-hint">Enter a URL or path (e.g. <code>/thank-you</code>).</p>
                         </div>
                     </div>
                 </template>
@@ -157,14 +148,6 @@ export default {
             saving:      false,
             saveMessage: '',
             saveError:   false,
-            linkMeta:    null,
-            linkConfig: {
-                type: 'link',
-                display: 'Redirect to',
-                handle: 'redirect_url',
-                required: false,
-                collections: [],
-            },
             form: {
                 enabled:              true,
                 submit_label:         'Submit',
@@ -191,9 +174,7 @@ export default {
     async mounted() {
         try {
             const { data } = await this.$axios.get(this.settingsUrl);
-            this.linkMeta = data.redirect_url_meta ?? {};
-            const { redirect_url_meta, ...formData } = data;
-            this.form = { ...this.form, ...formData };
+            this.form = { ...this.form, ...data };
         } catch {
             // Keep defaults if load fails
         } finally {
