@@ -12,9 +12,13 @@ class MailSettingsController extends CpController
 {
     public function show()
     {
+        return view('forms-plus::mail-settings');
+    }
+
+    public function api()
+    {
         $settings = MailSettingsManager::get();
 
-        // Never send the stored password back to the browser
         $passwordSet = ! empty($settings['password']);
         $settings['password'] = '';
         $settings['password_set'] = $passwordSet;

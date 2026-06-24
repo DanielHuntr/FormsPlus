@@ -20,6 +20,7 @@ Route::prefix('forms-plus')->name('forms-plus.')->group(function () {
 
     // Mail settings (must be above /{handle} routes)
     Route::get('/mail-settings', [MailSettingsController::class, 'show'])->name('mail-settings');
+    Route::get('/mail-settings/api', [MailSettingsController::class, 'api'])->name('mail-settings.api');
     Route::post('/mail-settings', [MailSettingsController::class, 'save'])->name('mail-settings.save');
     Route::post('/mail-settings/test', [MailSettingsController::class, 'test'])->name('mail-settings.test');
 
