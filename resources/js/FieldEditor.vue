@@ -162,7 +162,7 @@ export default {
     computed: {
         fieldTypeLabel() {
             if (this.local.type === 'text') {
-                const map = { email: 'Email', tel: 'Phone', number: 'Number', text: 'Text' };
+                const map = { email: 'Email', tel: 'Phone', number: 'Number', text: 'Text', url: 'URL', date: 'Date', time: 'Time', 'datetime-local': 'Date & Time' };
                 return (map[this.local.input_type] ?? 'Text') + ' Field';
             }
             const map = {
@@ -176,7 +176,11 @@ export default {
         },
 
         hasPlaceholder() {
-            return ['text', 'textarea', 'select'].includes(this.local.type);
+            if (this.local.type === 'textarea' || this.local.type === 'select') return true;
+            if (this.local.type === 'text') {
+                return !['date', 'time', 'datetime-local'].includes(this.local.input_type);
+            }
+            return false;
         },
 
         hasOptions() {

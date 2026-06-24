@@ -296,6 +296,11 @@ export default {
   </div>
 
   <div class="${cls('flexible-form__field', 'wrapper')}">
+    <label class="${cls('flexible-form__label', 'label')}">Date of Birth</label>
+    <input type="date" class="${cls('flexible-form__input', 'input')}">
+  </div>
+
+  <div class="${cls('flexible-form__field', 'wrapper')}">
     <label class="${cls('flexible-form__label', 'label')}">Message</label>
     <textarea class="${cls('flexible-form__input', 'textarea')}" rows="3" placeholder="Your message…"></textarea>
   </div>
