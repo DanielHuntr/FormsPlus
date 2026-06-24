@@ -5,6 +5,7 @@ namespace App\FormsPlus\Listeners;
 use App\FormsPlus\SettingsManager;
 use App\FormsPlus\TemplateManager;
 use App\FormsPlus\TemplateRenderer;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Statamic\Events\FormSubmitted;
 
@@ -59,8 +60,8 @@ class HandleFormSubmission
                     $message->replyTo($replyTo);
                 }
             });
-        } catch (\Throwable) {
-            //
+        } catch (\Throwable $e) {
+            Log::error('[Forms Plus] Failed to send notification email: ' . $e->getMessage());
         }
     }
 
@@ -75,8 +76,8 @@ class HandleFormSubmission
             Mail::html($html, function ($message) use ($submitterEmail, $subject) {
                 $message->to($submitterEmail)->subject($subject);
             });
-        } catch (\Throwable) {
-            //
+        } catch (\Throwable $e) {
+            Log::error('[Forms Plus] Failed to send confirmation email: ' . $e->getMessage());
         }
     }
 }
