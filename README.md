@@ -130,6 +130,28 @@ Use the **Send Test** button to verify your configuration before going live. Sav
 
 ---
 
+## Embedding a Form in a Blueprint (Fieldtype)
+
+Forms Plus ships a **Forms Plus** fieldtype you can add to any Statamic blueprint. This lets content editors pick which form appears on a page directly from the entry editor, without hardcoding a handle in your template.
+
+### Adding the fieldtype
+
+1. Open the blueprint you want to edit (e.g. a **Pages** blueprint) in **Fields → Blueprints**.
+2. Add a new field and search for **Forms Plus** in the fieldtype picker.
+3. Give it a handle (e.g. `form`) and save the blueprint.
+
+### Rendering in Antlers
+
+The fieldtype augments to the fully rendered form HTML. Output it anywhere in your template:
+
+```antlers
+{{ form }}
+```
+
+That's it — the form is rendered with all your theme styles, settings, and submission handling applied automatically. No additional tag parameters are needed.
+
+---
+
 ## Rendering a Form (Antlers)
 
 Use the `{{ forms_plus }}` tag in any Antlers template:
