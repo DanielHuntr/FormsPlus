@@ -1,0 +1,6 @@
+<?php
+
+use App\FormsPlus\Http\Controllers\PublicFormController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('__forms/{handle}', [PublicFormController::class, 'render'])->name('forms-plus.render');
