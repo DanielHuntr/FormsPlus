@@ -29,14 +29,16 @@ class SettingsController extends CpController
         }
 
         $validated = $request->validate([
-            'enabled'              => 'boolean',
-            'submit_label'         => 'nullable|string|max:100',
-            'notification_email'   => 'nullable|email|max:255',
-            'reply_to_field'       => 'nullable|string|max:255',
-            'on_submit'            => 'required|in:message,redirect',
-            'success_title'        => 'nullable|string|max:255',
-            'success_message'      => 'nullable|string|max:2000',
-            'redirect_url'         => 'nullable|string|max:500',
+            'enabled'                    => 'boolean',
+            'submit_label'               => 'nullable|string|max:100',
+            'notification_email'         => 'nullable|email|max:255',
+            'reply_to_field'             => 'nullable|string|max:255',
+            'confirmation_email_enabled' => 'boolean',
+            'confirmation_email_field'   => 'nullable|string|max:255',
+            'on_submit'                  => 'required|in:message,redirect',
+            'success_title'              => 'nullable|string|max:255',
+            'success_message'            => 'nullable|string|max:2000',
+            'redirect_url'               => 'nullable|string|max:500',
         ]);
 
         SettingsManager::save($handle, $validated);
