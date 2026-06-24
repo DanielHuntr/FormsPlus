@@ -288,6 +288,17 @@ export default {
             this.loading = false;
             this.$nextTick(() => this.refreshPreview());
         }
+        this._onSave = (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+                e.preventDefault();
+                this.save();
+            }
+        };
+        document.addEventListener('keydown', this._onSave);
+    },
+
+    beforeUnmount() {
+        document.removeEventListener('keydown', this._onSave);
     },
 
     methods: {

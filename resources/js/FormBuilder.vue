@@ -279,6 +279,17 @@ export default {
 
     async mounted() {
         await this.loadFields();
+        this._onSave = (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 's' && this.currentTab === 'fields') {
+                e.preventDefault();
+                this.save();
+            }
+        };
+        document.addEventListener('keydown', this._onSave);
+    },
+
+    beforeUnmount() {
+        document.removeEventListener('keydown', this._onSave);
     },
 
     methods: {
