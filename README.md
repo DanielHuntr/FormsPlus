@@ -25,13 +25,14 @@ Statamic will automatically discover and register the addon. On the first page l
 
 ## Control Panel
 
-Navigate to **Forms Plus** in the CP sidebar. The section has three areas:
+Navigate to **Forms Plus** in the CP sidebar. The section has four areas:
 
 | Area | Purpose |
-|---|---|
+| --- | --- |
 | All Forms | Create, edit, and delete forms |
 | Email Templates | Set global default email templates |
 | Theme | Style all forms with a live preview editor |
+| Mail Settings | Configure a custom SMTP account for sending emails |
 
 ---
 
@@ -54,7 +55,7 @@ Drag fields from the left palette onto the canvas, or click them to add in order
 **Available field types:**
 
 | Type | Description |
-|---|---|
+| --- | --- |
 | Text | Single-line text input |
 | Email | Email address input |
 | Phone | Telephone number input |
@@ -94,14 +95,38 @@ Configure per-form behaviour:
 - **Success title / message** — shown after a successful submission
 - **Enable/disable** — temporarily disable the form without deleting it
 
+**Email notifications:**
+
+- **Send notification to** — the email address that receives an alert on every submission. Leave empty to disable notifications.
+- **Reply-to field** — when you reply to a notification, the reply goes to the submitter instead of their own address. Automatically pre-selected if the form has a single email field.
+- **Confirmation email** — toggle whether to send the submitter a confirmation email.
+- **Submitter email field** — the form field that holds the submitter's email address. Automatically pre-selected if the form has a single email field.
+
 ### Email
 
-Configure email notifications per form:
+Design the HTML email templates sent for this form. Both the notification (to your team) and confirmation (to the submitter) templates can be customised with a drag-and-drop builder and support variables like `{{name}}`, `{{email}}`, etc. Templates can inherit from the global defaults set in **Email Templates**.
 
-- **Notification email** — sent to your team when a submission arrives. Supports custom subject, reply-to, and a drag-and-drop email body builder with variables like `{{name}}`, `{{email}}`, etc.
-- **Confirmation email** — sent to the submitter. Can use the same variables to personalise the message.
+---
 
-Both templates can inherit from the global defaults set in **Email Templates**.
+## Mail Settings
+
+By default Forms Plus sends emails using the server's `MAIL_MAILER` setting from `.env`. To use a dedicated SMTP account (e.g. Gmail) without touching `.env`, go to **Forms Plus → Mail Settings**.
+
+| Field | Description |
+| --- | --- |
+| Host | SMTP server hostname (e.g. `smtp.gmail.com`) |
+| Port | Usually `587` for TLS or `465` for SSL |
+| Encryption | TLS (recommended), SSL, or None |
+| Username | Your SMTP username / email address |
+| Password | Your SMTP password or app password. Never returned to the browser after saving. |
+| From address | The address emails are sent from |
+| From name | The display name shown in the recipient's inbox |
+
+Enable the **Use custom mail settings** toggle to activate. When disabled, Forms Plus falls back to the server default.
+
+**Gmail users:** Google requires an [App Password](https://myaccount.google.com/apppasswords) — your regular account password will not work for SMTP. Create one at myaccount.google.com/apppasswords and enter it in the Password field.
+
+Use the **Send Test** button to verify your configuration before going live. Save your settings first, then enter an address and click Send Test.
 
 ---
 
@@ -116,7 +141,7 @@ Use the `{{ forms_plus }}` tag in any Antlers template:
 ### Parameters
 
 | Parameter | Required | Description |
-|---|---|---|
+| --- | --- | --- |
 | `handle` | Yes | The form's handle |
 | `redirect` | No | URL to redirect to after successful submission. Overrides the per-form setting. |
 | `error_redirect` | No | URL to redirect to if validation fails |
@@ -148,7 +173,7 @@ Go to **Forms Plus → Theme** for a live preview style editor. Choose a preset 
 Available style targets:
 
 | Key | Element |
-|---|---|
+| --- | --- |
 | Form wrapper | The `<form>` element |
 | Field wrapper | Each field's wrapper `<div>` |
 | Label | Field labels |
@@ -169,7 +194,7 @@ The **Custom CSS** section in the theme editor accepts any CSS targeting the `.f
 **Full class reference:**
 
 | Class | Element |
-|---|---|
+| --- | --- |
 | `.flexible-form` | The `<form>` element |
 | `.flexible-form__field` | Each field wrapper |
 | `.flexible-form__label` | Field labels |
@@ -219,8 +244,8 @@ php artisan optimize:clear
 ## Keyboard Shortcuts
 
 | Shortcut | Action |
-|---|---|
-| Cmd+S / Ctrl+S | Save the current editor (fields, settings, styles, or email template) |
+| --- | --- |
+| Cmd+S / Ctrl+S | Save the current editor (fields, settings, styles, email template, or mail settings) |
 
 ---
 
