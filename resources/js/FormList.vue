@@ -2,7 +2,7 @@
     <div class="ff-wrap">
         <header class="ff-header">
             <div>
-                <h1 class="ff-title">Flexible Forms</h1>
+                <h1 class="ff-title">Forms Plus</h1>
                 <p class="ff-subtitle">Build and manage your forms with a visual editor.</p>
             </div>
             <button class="ff-btn ff-btn--primary" @click="showCreate = true">
