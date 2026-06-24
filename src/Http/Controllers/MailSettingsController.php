@@ -53,10 +53,21 @@ class MailSettingsController extends CpController
     public function test(Request $request)
     {
         $request->validate([
-            'to' => 'required|email',
+            'to'   => 'required|email',
+            'host' => 'nullable|string',
         ]);
 
-        $config = MailSettingsManager::get();
+        // Use values from the request (current form) if provided, otherwise fall back to saved config
+        $saved  = MailSettingsManager::get();
+        $config = array_merge($saved, array_filter([
+            'host'         => $request->host,
+            'port'         => $request->port,
+            'encryption'   => $request->encryption,
+            'username'     => $request->username,
+            'password'     => $request->password ?: $saved['password'],
+            'from_address' => $request->from_address,
+            'from_name'    => $request->from_name,
+        ], fn($v) => $v !== null && $v !== ''));
 
         if (empty($config['host'])) {
             return response()->json(['success' => false, 'message' => 'No SMTP host configured.'], 422);

@@ -135,7 +135,18 @@
             v-if="currentTab === 'email'"
             :email-notification-url="emailNotificationUrl"
             :email-confirmation-url="emailConfirmationUrl"
+            :email-preview-url="emailPreviewUrl"
         />
+
+        <!-- Preview tab -->
+        <div v-if="currentTab === 'preview'" class="ff-preview">
+            <iframe
+                :src="previewUrl"
+                class="ff-preview__frame"
+                frameborder="0"
+                title="Form Preview"
+            ></iframe>
+        </div>
 
     </div>
 </template>
@@ -243,6 +254,8 @@ export default {
         settingsSaveUrl:      { type: String, required: true },
         emailNotificationUrl: { type: String, required: true },
         emailConfirmationUrl: { type: String, required: true },
+        emailPreviewUrl:      { type: String, required: true },
+        previewUrl:           { type: String, required: true },
     },
 
     data() {
@@ -263,6 +276,7 @@ export default {
                 { key: 'submissions', label: 'Submissions' },
                 { key: 'settings',    label: 'Settings' },
                 { key: 'email',       label: 'Email' },
+                { key: 'preview',     label: 'Preview' },
             ],
         };
     },

@@ -120,6 +120,9 @@
                             class="etb__save-msg"
                             :class="saveError ? 'etb__save-msg--error' : 'etb__save-msg--ok'"
                         >{{ saveMessage }}</span>
+                        <button class="ff-btn ff-btn--ghost" :disabled="previewing" @click="openPreview" style="margin-right:8px">
+                            {{ previewing ? 'Loading…' : 'Preview' }}
+                        </button>
                         <button class="ff-btn ff-btn--primary" :disabled="saving" @click="save">
                             {{ saving ? 'Saving…' : 'Save Template' }}
                         </button>
@@ -334,6 +337,25 @@
                 </div>
             </div>
         </div>
+
+        <!-- Email preview modal -->
+        <div v-if="previewOpen" class="etb__preview-overlay" @click.self="previewOpen = false">
+            <div class="etb__preview-modal">
+                <div class="etb__preview-header">
+                    <span class="etb__preview-title">Email Preview</span>
+                    <button class="etb__preview-close" @click="previewOpen = false" title="Close">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <iframe
+                    v-if="previewHtml"
+                    class="etb__preview-frame"
+                    :srcdoc="previewHtml"
+                    frameborder="0"
+                    title="Email Preview"
+                ></iframe>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -399,7 +421,8 @@ const BLOCK_LABELS = {
 
 export default {
     props: {
-        apiUrl:        { type: String, required: true },
+        apiUrl:         { type: String, required: true },
+        previewApiUrl:  { type: String, required: true },
         showUseDefault: { type: Boolean, default: false },
     },
 
@@ -412,6 +435,10 @@ export default {
             useDefault:     true,
             template:       { subject: '', blocks: [] },
             selectedIndex:  null,
+            // preview
+            previewing:   false,
+            previewOpen:  false,
+            previewHtml:  '',
             // drag state
             draggingPalette: null,
             draggingCanvas:  null,
@@ -565,6 +592,19 @@ export default {
 
         copyVar(key) {
             navigator.clipboard?.writeText('{{' + key + '}}').catch(() => {});
+        },
+
+        async openPreview() {
+            this.previewing = true;
+            try {
+                const { data } = await this.$axios.post(this.previewApiUrl, { template: this.template });
+                this.previewHtml = data.html;
+                this.previewOpen = true;
+            } catch {
+                //
+            } finally {
+                this.previewing = false;
+            }
         },
     },
 };

@@ -31,6 +31,7 @@
             </div>
             <EmailTemplateBuilder
                 :api-url="emailNotificationUrl"
+                :preview-api-url="emailPreviewUrl"
                 :show-use-default="false"
             />
         </div>
@@ -42,6 +43,7 @@
             </div>
             <EmailTemplateBuilder
                 :api-url="emailConfirmationUrl"
+                :preview-api-url="emailPreviewUrl"
                 :show-use-default="false"
             />
         </div>
@@ -57,6 +59,7 @@ export default {
     props: {
         emailNotificationUrl: { type: String, required: true },
         emailConfirmationUrl: { type: String, required: true },
+        emailPreviewUrl:      { type: String, required: true },
     },
 
     data() {

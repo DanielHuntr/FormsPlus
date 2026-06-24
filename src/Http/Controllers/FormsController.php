@@ -2,6 +2,8 @@
 
 namespace App\FormsPlus\Http\Controllers;
 
+use App\FormsPlus\SettingsManager;
+use App\FormsPlus\StylesManager;
 use Illuminate\Http\Request;
 use Statamic\Facades\Form;
 use Statamic\Http\Controllers\CP\CpController;
@@ -62,6 +64,27 @@ class FormsController extends CpController
             'settingsSaveUrl'      => cp_route('forms-plus.settings.save', $handle),
             'emailNotificationUrl' => cp_route('forms-plus.email.get', [$handle, 'notification']),
             'emailConfirmationUrl' => cp_route('forms-plus.email.get', [$handle, 'confirmation']),
+            'previewUrl'           => cp_route('forms-plus.preview', $handle),
+        ]);
+    }
+
+    public function preview(string $handle)
+    {
+        $form = Form::find($handle);
+
+        if (! $form) {
+            abort(404);
+        }
+
+        return view('forms-plus::form-preview', [
+            'fields'      => $this->extractFieldsForPartial($form),
+            'styles'      => StylesManager::get(),
+            'settings'    => SettingsManager::get($handle),
+            'submitLabel' => SettingsManager::get($handle)['submit_label'] ?? 'Submit',
+            'actionUrl'   => '#',
+            'redirect'    => '',
+            'errorRedirect' => '',
+            'submitted'   => false,
         ]);
     }
 
@@ -124,6 +147,39 @@ class FormsController extends CpController
         $form->delete();
 
         return response()->json(['success' => true]);
+    }
+
+    private function extractFieldsForPartial($form): \Illuminate\Support\Collection
+    {
+        $contents = $form->blueprint()->contents();
+        $fields   = collect();
+
+        foreach ($contents['tabs'] ?? [] as $tab) {
+            foreach ($tab['sections'] ?? [] as $section) {
+                foreach ($section['fields'] ?? [] as $fieldData) {
+                    if (! isset($fieldData['handle'])) {
+                        continue;
+                    }
+                    $config = $fieldData['field'] ?? [];
+                    $fields->push([
+                        'handle'             => $fieldData['handle'],
+                        'display'            => $config['display'] ?? ucwords(str_replace('_', ' ', $fieldData['handle'])),
+                        'type'               => $config['type'] ?? 'text',
+                        'input_type'         => $config['input_type'] ?? 'text',
+                        'placeholder'        => $config['placeholder'] ?? '',
+                        'instructions'       => $config['instructions'] ?? '',
+                        'required'           => in_array('required', $config['validate'] ?? []),
+                        'width'              => $config['width'] ?? 100,
+                        'options'            => $config['options'] ?? [],
+                        'multiple'           => $config['multiple'] ?? false,
+                        'rows'               => $config['rows'] ?? 3,
+                        'allowed_extensions' => $config['allowed_extensions'] ?? [],
+                    ]);
+                }
+            }
+        }
+
+        return $fields;
     }
 
     private function extractFields($form): array

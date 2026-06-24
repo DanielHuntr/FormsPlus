@@ -17,6 +17,7 @@ Route::prefix('forms-plus')->name('forms-plus.')->group(function () {
     Route::get('/email-templates', [EmailTemplateController::class, 'showDefaults'])->name('email-templates');
     Route::get('/email-templates/{type}', [EmailTemplateController::class, 'getTemplate'])->name('email-templates.get');
     Route::post('/email-templates/{type}', [EmailTemplateController::class, 'saveTemplate'])->name('email-templates.save');
+    Route::post('/email-preview', [EmailTemplateController::class, 'preview'])->name('email-preview');
 
     // Mail settings (must be above /{handle} routes)
     Route::get('/mail-settings', [MailSettingsController::class, 'show'])->name('mail-settings');
@@ -29,6 +30,7 @@ Route::prefix('forms-plus')->name('forms-plus.')->group(function () {
     Route::get('/theme/api', [StylesController::class, 'show'])->name('styles.api');
     Route::post('/theme/api', [StylesController::class, 'save'])->name('styles.save');
 
+    Route::get('/{handle}/preview', [FormsController::class, 'preview'])->name('preview');
     Route::get('/{handle}/edit', [FormsController::class, 'edit'])->name('edit');
     Route::get('/{handle}/fields', [FormsController::class, 'fields'])->name('fields');
     Route::post('/{handle}/fields', [FormsController::class, 'saveFields'])->name('fields.save');
