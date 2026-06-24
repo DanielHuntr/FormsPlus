@@ -60,8 +60,9 @@
                     <!-- Custom CSS -->
                     <div class="fst__group">
                         <div class="fst__group-title">Custom CSS</div>
-                        <p class="fst__hint">Targets <code>.flexible-form</code> and its children. Applied as a <code>&lt;style&gt;</code> block on the page.</p>
+                        <p class="fst__hint">Injected as a <code>&lt;style&gt;</code> block on the page. Click a class below to insert a rule at your cursor.</p>
                         <textarea
+                            ref="customCss"
                             v-model="styles.custom_css"
                             class="fst__textarea"
                             rows="8"
@@ -69,6 +70,18 @@
                             @input="debouncedRefresh"
                             spellcheck="false"
                         ></textarea>
+                        <div class="fst__class-ref">
+                            <p class="fst__class-ref-hint">Available classes — hover for details, click to insert:</p>
+                            <div class="fst__class-chips">
+                                <button
+                                    v-for="cls in availableClasses"
+                                    :key="cls.name"
+                                    class="fst__class-chip"
+                                    :title="cls.description"
+                                    @click="insertClass(cls.name)"
+                                >.{{ cls.name }}</button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Save -->
@@ -246,6 +259,22 @@ export default {
             inputElements:    ELEMENTS.inputs,
             choiceElements:   ELEMENTS.choices,
             feedbackElements: ELEMENTS.feedback,
+            availableClasses: [
+                { name: 'flexible-form',             description: 'The <form> element' },
+                { name: 'flexible-form__field',      description: 'Each field wrapper div' },
+                { name: 'flexible-form__label',      description: 'Field labels' },
+                { name: 'flexible-form__instructions', description: 'Help/hint text below labels' },
+                { name: 'flexible-form__input',      description: 'Text, email, number, date, time, URL inputs · textareas · selects' },
+                { name: 'flexible-form__checkbox',   description: 'Checkbox inputs' },
+                { name: 'flexible-form__radio',      description: 'Radio inputs' },
+                { name: 'flexible-form__check-label', description: 'Checkbox/radio label wrappers' },
+                { name: 'flexible-form__check-group', description: 'Container for checkbox/radio options' },
+                { name: 'flexible-form__fieldset',   description: 'Fieldset for checkbox/radio groups' },
+                { name: 'flexible-form__error-msg',  description: 'Validation error messages' },
+                { name: 'flexible-form__button',     description: 'Submit button' },
+                { name: 'flexible-form__submit',     description: 'Submit button wrapper div' },
+                { name: 'flexible-form__input--error', description: 'Input modifier applied when a field has a validation error' },
+            ],
         };
     },
 
@@ -378,6 +407,21 @@ ${s.custom_css || ''}
 ${formHtml}
 </body>
 </html>`;
+        },
+
+        insertClass(className) {
+            const el = this.$refs.customCss;
+            const start = el.selectionStart;
+            const current = this.styles.custom_css || '';
+            const prefix = current.length > 0 && !current.endsWith('\n') ? '\n\n' : '';
+            const snippet = `${prefix}.${className} {\n  \n}`;
+            this.styles.custom_css = current.slice(0, start) + snippet + current.slice(el.selectionEnd);
+            this.$nextTick(() => {
+                const cursorPos = start + prefix.length + `.${className} {\n  `.length;
+                el.focus();
+                el.setSelectionRange(cursorPos, cursorPos);
+            });
+            this.debouncedRefresh();
         },
 
         async save() {

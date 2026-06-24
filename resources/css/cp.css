@@ -864,3 +864,21 @@
     border: none;
     min-height: 520px;
 }
+
+/* ── Class reference chips ── */
+.fst__class-ref { margin-top: 10px; }
+.fst__class-ref-hint { font-size: 0.6875rem; color: var(--color-grey-40, #9ca3af); margin: 0 0 6px; }
+.fst__class-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.fst__class-chip {
+    font-size: 0.6875rem;
+    font-family: ui-monospace, monospace;
+    padding: 3px 7px;
+    background: var(--color-grey-10, #f3f4f6);
+    border: 1px solid var(--color-grey-20, #e5e7eb);
+    border-radius: 4px;
+    color: #4338ca;
+    cursor: pointer;
+    transition: background .1s, border-color .1s;
+    white-space: nowrap;
+}
+.fst__class-chip:hover { background: #e0e7ff; border-color: #c7d2fe; }
