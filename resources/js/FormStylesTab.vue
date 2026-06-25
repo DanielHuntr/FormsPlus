@@ -147,7 +147,7 @@
 </template>
 
 <script>
-import { EditorView } from '@codemirror/view';
+import { EditorView, keymap } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
 import { basicSetup } from 'codemirror';
 import { css as cssLang } from '@codemirror/lang-css';
@@ -301,6 +301,14 @@ export default {
     },
 
     async mounted() {
+        this._onSave = (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+                e.preventDefault();
+                this.save();
+            }
+        };
+        document.addEventListener('keydown', this._onSave);
+
         try {
             const { data } = await this.$axios.get(this.stylesUrl);
             this.styles = { ...this.styles, ...data };
@@ -312,14 +320,6 @@ export default {
         await this.$nextTick();
         this.createEditor(this.$refs.cssEditorMount);
         this.refreshPreview();
-
-        this._onSave = (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 's') {
-                e.preventDefault();
-                this.save();
-            }
-        };
-        document.addEventListener('keydown', this._onSave);
     },
 
     beforeUnmount() {
@@ -334,6 +334,7 @@ export default {
             const extensions = [
                 basicSetup,
                 cssLang(),
+                keymap.of([{ key: 'Mod-s', run: () => { this.save(); return true; } }]),
                 EditorView.updateListener.of(update => {
                     if (update.docChanged) {
                         this.styles.custom_css = update.state.doc.toString();
