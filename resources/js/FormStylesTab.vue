@@ -140,7 +140,19 @@
 
         <!-- Undocked float panel -->
         <div v-if="!loading && !docked" class="fst__css-float" :class="'fst__css-float--' + dockPosition" :style="floatStyle">
-            <div class="fst__css-float-resize" :style="resizeHandleStyle" @mousedown.prevent="startResize"></div>
+            <!-- 8-direction resize handles for detached modal -->
+            <template v-if="dockPosition === 'detached'">
+                <div class="fst__modal-resize fst__modal-resize--n"  @mousedown.prevent="startResize($event,'n')"></div>
+                <div class="fst__modal-resize fst__modal-resize--s"  @mousedown.prevent="startResize($event,'s')"></div>
+                <div class="fst__modal-resize fst__modal-resize--e"  @mousedown.prevent="startResize($event,'e')"></div>
+                <div class="fst__modal-resize fst__modal-resize--w"  @mousedown.prevent="startResize($event,'w')"></div>
+                <div class="fst__modal-resize fst__modal-resize--ne" @mousedown.prevent="startResize($event,'ne')"></div>
+                <div class="fst__modal-resize fst__modal-resize--nw" @mousedown.prevent="startResize($event,'nw')"></div>
+                <div class="fst__modal-resize fst__modal-resize--se" @mousedown.prevent="startResize($event,'se')"></div>
+                <div class="fst__modal-resize fst__modal-resize--sw" @mousedown.prevent="startResize($event,'sw')"></div>
+            </template>
+            <!-- Single edge handle for docked panels -->
+            <div v-else class="fst__css-float-resize" :style="resizeHandleStyle" @mousedown.prevent="startResize($event)"></div>
             <div class="fst__css-float-header">
                 <div
                     class="fst__css-float-title"
@@ -618,11 +630,10 @@ export default {
         },
         resizeHandleStyle() {
             switch (this.dockPosition) {
-                case 'bottom':   return { top: 0,    left: 0,    right: 0,  height: '5px',  cursor: 'ns-resize' };
-                case 'top':      return { bottom: 0, left: 0,    right: 0,  height: '5px',  cursor: 'ns-resize' };
-                case 'left':     return { top: 0,    bottom: 0,  right: 0,  width:  '5px',  cursor: 'ew-resize' };
-                case 'right':    return { top: 0,    bottom: 0,  left: 0,   width:  '5px',  cursor: 'ew-resize' };
-                case 'detached': return { bottom: 0, right: 0,  width: '14px', height: '14px', cursor: 'nwse-resize' };
+                case 'bottom': return { top: 0,    left: 0,   right: 0,  height: '5px', cursor: 'ns-resize' };
+                case 'top':    return { bottom: 0, left: 0,   right: 0,  height: '5px', cursor: 'ns-resize' };
+                case 'left':   return { top: 0,    bottom: 0, right: 0,  width:  '5px', cursor: 'ew-resize' };
+                case 'right':  return { top: 0,    bottom: 0, left: 0,   width:  '5px', cursor: 'ew-resize' };
                 default: return {};
             }
         },
@@ -893,30 +904,49 @@ ${formHtml}
             });
         },
 
-        startResize(e) {
+        startResize(e, direction) {
             const pos = this.dockPosition;
-            const cursors = { bottom: 'ns-resize', top: 'ns-resize', left: 'ew-resize', right: 'ew-resize', detached: 'nwse-resize' };
 
-            if (pos === 'detached') {
-                const startX = e.clientX, startY = e.clientY;
-                const startW = this.floatWidth, startH = this.floatHeight;
-                this._dragStart(cursors[pos], () => (e) => {
-                    this.floatWidth  = Math.max(300, Math.min(window.innerWidth  * 0.85, startW + (e.clientX - startX)));
-                    this.floatHeight = Math.max(200, Math.min(window.innerHeight * 0.85, startH + (e.clientY - startY)));
-                });
-                return;
+            // For docked panels, derive direction from which edge the handle is on
+            if (!direction) {
+                direction = { bottom: 'n', top: 's', left: 'e', right: 'w' }[pos] || 'n';
             }
 
-            const isVertical = pos === 'top' || pos === 'bottom';
-            const startPos  = isVertical ? e.clientY : e.clientX;
-            const startSize = isVertical ? this.floatHeight : this.floatWidth;
-            this._dragStart(cursors[pos], () => (e) => {
-                const current = isVertical ? e.clientY : e.clientX;
-                const delta   = (pos === 'bottom' || pos === 'right') ? startPos - current : current - startPos;
-                if (isVertical) {
-                    this.floatHeight = Math.max(160, Math.min(window.innerHeight * 0.85, startSize + delta));
-                } else {
-                    this.floatWidth  = Math.max(200, Math.min(window.innerWidth  * 0.70,  startSize + delta));
+            const cursorMap = { n: 'ns-resize', s: 'ns-resize', e: 'ew-resize', w: 'ew-resize', ne: 'ne-resize', nw: 'nw-resize', se: 'se-resize', sw: 'sw-resize' };
+            const startClientX = e.clientX, startClientY = e.clientY;
+            const startX = this.floatX, startY = this.floatY;
+            const startW = this.floatWidth, startH = this.floatHeight;
+            const minW = 300, minH = 200;
+
+            const detached = pos === 'detached';
+
+            this._dragStart(cursorMap[direction] || 'default', () => (ev) => {
+                const dx = ev.clientX - startClientX;
+                const dy = ev.clientY - startClientY;
+
+                if (direction.includes('s')) {
+                    this.floatHeight = Math.max(minH, Math.min(window.innerHeight * 0.9, startH + dy));
+                }
+                if (direction.includes('n')) {
+                    if (detached) {
+                        const clampedY = Math.max(54, Math.min(startY + startH - minH, startY + dy));
+                        this.floatY      = clampedY;
+                        this.floatHeight = startY + startH - clampedY;
+                    } else {
+                        this.floatHeight = Math.max(minH, Math.min(window.innerHeight * 0.85, startH - dy));
+                    }
+                }
+                if (direction.includes('e')) {
+                    this.floatWidth = Math.max(minW, Math.min(window.innerWidth * 0.9, startW + dx));
+                }
+                if (direction.includes('w')) {
+                    if (detached) {
+                        const clampedX = Math.max(0, Math.min(startX + startW - minW, startX + dx));
+                        this.floatX     = clampedX;
+                        this.floatWidth = startX + startW - clampedX;
+                    } else {
+                        this.floatWidth = Math.max(minW, Math.min(window.innerWidth * 0.70, startW - dx));
+                    }
                 }
             });
         },

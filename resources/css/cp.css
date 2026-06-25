@@ -969,18 +969,24 @@
     box-shadow: 0 24px 64px rgba(0,0,0,.6), 0 0 0 1px rgba(59,130,246,.3);
     overflow: hidden;
 }
-/* Detached: corner resize grip */
-.fst__css-float--detached .fst__css-float-resize::after {
-    content: '';
-    display: block;
-    width: 7px;
-    height: 7px;
-    border-right: 2px solid rgba(255,255,255,.25);
-    border-bottom: 2px solid rgba(255,255,255,.25);
-    border-radius: 0 0 3px 0;
-    transition: border-color .15s;
+/* 8-directional resize handles for detached modal */
+.fst__modal-resize {
+    position: absolute;
+    z-index: 2;
+    background: transparent;
+    transition: background .12s;
 }
-.fst__css-float--detached .fst__css-float-resize:hover::after { border-color: #3b82f6; }
+.fst__modal-resize:hover { background: rgba(59,130,246,.2); }
+/* Edge handles */
+.fst__modal-resize--n  { top: 0;    left: 8px;   right: 8px;  height: 5px; cursor: ns-resize;  }
+.fst__modal-resize--s  { bottom: 0; left: 8px;   right: 8px;  height: 5px; cursor: ns-resize;  }
+.fst__modal-resize--e  { right: 0;  top: 8px;    bottom: 8px; width: 5px;  cursor: ew-resize;  }
+.fst__modal-resize--w  { left: 0;   top: 8px;    bottom: 8px; width: 5px;  cursor: ew-resize;  }
+/* Corner handles — larger hit area, higher z-index so they win over edges */
+.fst__modal-resize--ne { top: 0;    right: 0;  width: 10px; height: 10px; cursor: ne-resize;  z-index: 3; }
+.fst__modal-resize--nw { top: 0;    left: 0;   width: 10px; height: 10px; cursor: nw-resize;  z-index: 3; }
+.fst__modal-resize--se { bottom: 0; right: 0;  width: 10px; height: 10px; cursor: se-resize;  z-index: 3; }
+.fst__modal-resize--sw { bottom: 0; left: 0;   width: 10px; height: 10px; cursor: sw-resize;  z-index: 3; }
 /* Draggable title bar */
 .fst__css-float-title--draggable { cursor: grab; flex: 1; }
 .fst__css-float-title--draggable:active { cursor: grabbing; }
