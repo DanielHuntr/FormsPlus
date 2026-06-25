@@ -564,6 +564,7 @@ export default {
             const extensions = [
                 basicSetup,
                 cssLang(),
+                EditorView.lineWrapping,
                 keymap.of([{ key: 'Mod-s', run: () => { this.save(); return true; } }]),
                 EditorView.updateListener.of(update => {
                     if (update.docChanged) {
