@@ -65,6 +65,25 @@ class StylesController extends CpController
 
         StylesManager::save($request->only(array_keys(StylesManager::defaults())));
 
-        return response()->json(['success' => true]);
+        $css = trim($request->input('css', ''));
+        StylesManager::writeCssSourceFile($css);
+
+        $importAdded = false;
+        $importFile  = null;
+
+        if ($css !== '' && $request->filled('preview_stylesheet')) {
+            $targetPath = StylesManager::resolvePreviewStylesheetPath($request->input('preview_stylesheet'));
+
+            if ($targetPath) {
+                $importAdded = StylesManager::injectImport($targetPath);
+                $importFile  = basename($targetPath);
+            }
+        }
+
+        return response()->json([
+            'success'      => true,
+            'import_added' => $importAdded,
+            'import_file'  => $importFile,
+        ]);
     }
 }

@@ -840,8 +840,11 @@ ${formHtml}
         async save() {
             this.saving = true;
             try {
-                await this.$axios.post(this.stylesSaveUrl, this.styles);
+                const { data } = await this.$axios.post(this.stylesSaveUrl, this.styles);
                 this.$toast.success('Styles saved');
+                if (data.import_added) {
+                    this.$toast.success(`@import added to ${data.import_file} — rebuild your CSS to apply @apply rules`);
+                }
             } catch {
                 this.$toast.error('Could not save styles.');
             } finally {
