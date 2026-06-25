@@ -33,8 +33,25 @@
                     <!-- Preview stylesheet -->
                     <div class="fst__group">
                         <div class="fst__group-title">Preview stylesheet</div>
-                        <p class="fst__hint">URL to your site's CSS so custom properties (e.g. <code>var(--color-brand)</code>) resolve in the live preview. Not injected into the form itself.</p>
-                        <input v-model="styles.preview_stylesheet" type="text" class="fst__input" placeholder="e.g. /css/site.css" @input="debouncedRefresh">
+                        <p class="fst__hint">Your site's CSS so custom properties (e.g. <code>var(--color-brand)</code>) resolve in the live preview. Not injected into the form itself.</p>
+                        <div v-if="cssFiles.length" class="fst__file-picker">
+                            <button
+                                v-for="file in cssFiles"
+                                :key="file.url"
+                                class="fst__file-btn"
+                                :class="{ 'fst__file-btn--active': styles.preview_stylesheet === file.url }"
+                                @click="styles.preview_stylesheet = styles.preview_stylesheet === file.url ? '' : file.url; debouncedRefresh()"
+                                :title="file.url"
+                            >
+                                <svg width="11" height="13" viewBox="0 0 11 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1 1h6l3 3v8H1V1z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>
+                                    <path d="M7 1v3h3" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>
+                                </svg>
+                                {{ file.label }}
+                            </button>
+                            <p v-if="!cssFiles.length" class="fst__hint">No CSS files found in <code>resources/css</code>.</p>
+                        </div>
+                        <p v-else class="fst__hint">No CSS files found in <code>resources/css/</code>.</p>
                     </div>
 
                     <!-- CSS editor -->
@@ -508,8 +525,9 @@ let refreshTimer = null;
 
 export default {
     props: {
-        stylesUrl:     { type: String, required: true },
+        stylesUrl:    { type: String, required: true },
         stylesSaveUrl: { type: String, required: true },
+        cssFilesUrl:  { type: String, required: true },
     },
 
     data() {
@@ -527,6 +545,7 @@ export default {
                 css:                '',
                 preview_stylesheet: '',
             },
+            cssFiles:       [],
             presets: PRESETS,
             availableClasses: [
                 { name: 'flexible-form',               description: 'The <form> element' },
@@ -578,8 +597,12 @@ export default {
         document.addEventListener('keydown', this._onSave);
 
         try {
-            const { data } = await this.$axios.get(this.stylesUrl);
-            this.styles = { ...this.styles, ...data };
+            const [stylesRes, cssFilesRes] = await Promise.all([
+                this.$axios.get(this.stylesUrl),
+                this.$axios.get(this.cssFilesUrl).catch(() => ({ data: [] })),
+            ]);
+            this.styles   = { ...this.styles, ...stylesRes.data };
+            this.cssFiles = cssFilesRes.data;
         } catch {
             //
         } finally {

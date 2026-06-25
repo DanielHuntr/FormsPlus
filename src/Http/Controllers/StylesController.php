@@ -4,6 +4,7 @@ namespace App\FormsPlus\Http\Controllers;
 
 use App\FormsPlus\StylesManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Statamic\Http\Controllers\CP\CpController;
 
 class StylesController extends CpController
@@ -18,6 +19,29 @@ class StylesController extends CpController
     public function show()
     {
         return response()->json(StylesManager::get());
+    }
+
+    public function cssFiles()
+    {
+        $dir = resource_path('css');
+
+        if (! File::isDirectory($dir)) {
+            return response()->json([]);
+        }
+
+        $files = collect(File::allFiles($dir))
+            ->filter(fn ($f) => $f->getExtension() === 'css')
+            ->map(function ($f) use ($dir) {
+                $relative = ltrim(str_replace($dir, '', $f->getPathname()), DIRECTORY_SEPARATOR);
+                $relative = str_replace(DIRECTORY_SEPARATOR, '/', $relative);
+                return [
+                    'label' => $relative,
+                    'url'   => '/css/' . $relative,
+                ];
+            })
+            ->values();
+
+        return response()->json($files);
     }
 
     public function save(Request $request)
