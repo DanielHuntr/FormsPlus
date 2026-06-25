@@ -922,27 +922,26 @@ ${formHtml}
         },
 
         _dragStart(cursor, makeOnMove) {
-            // Lock selection and cursor for the entire drag so fast mouse movement
-            // doesn't break the feel when the pointer leaves the handle element
+            // A full-screen overlay captures every pointer event for the entire drag.
+            // Without this, moving the mouse into the preview iframe hands control to
+            // the iframe's document and mousemove stops firing in the parent window.
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `position:fixed;inset:0;z-index:2147483647;cursor:${cursor};`;
+            document.body.appendChild(overlay);
             document.body.style.userSelect = 'none';
-            document.body.style.cursor     = cursor;
-
-            // Prevent CodeMirror from stealing pointer events during drag
-            const editorEl = this.$refs.cssEditorFloatMount;
-            if (editorEl) editorEl.style.pointerEvents = 'none';
 
             const onMove = makeOnMove();
 
             const onUp = () => {
+                overlay.remove();
                 document.body.style.userSelect = '';
-                document.body.style.cursor     = '';
-                if (editorEl) editorEl.style.pointerEvents = '';
-                document.removeEventListener('mousemove', onMove);
-                document.removeEventListener('mouseup',  onUp);
+                document.removeEventListener('mouseup', onUp);
             };
 
-            document.addEventListener('mousemove', onMove);
-            document.addEventListener('mouseup',  onUp);
+            overlay.addEventListener('mousemove', onMove);
+            overlay.addEventListener('mouseup', onUp);
+            // Also catch mouseup on document in case the pointer leaves the browser window
+            document.addEventListener('mouseup', onUp);
         },
 
         async buildCss() {
