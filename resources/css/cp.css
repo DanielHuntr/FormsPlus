@@ -864,12 +864,33 @@
 }
 
 /* ── Float panel (undocked, fixed bottom) ── */
+.fst__css-float-resize {
+    height: 5px;
+    flex-shrink: 0;
+    cursor: ns-resize;
+    background: transparent;
+    transition: background .15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.fst__css-float-resize::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 2px;
+    border-radius: 1px;
+    background: rgba(255,255,255,.15);
+    transition: background .15s;
+}
+.fst__css-float-resize:hover { background: rgba(59,130,246,.25); }
+.fst__css-float-resize:hover::after { background: #3b82f6; }
+
 .fst__css-float {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 340px;
     display: flex;
     flex-direction: column;
     background: #1e1e1e;

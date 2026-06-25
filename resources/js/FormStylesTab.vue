@@ -102,7 +102,8 @@
         </div>
 
         <!-- Undocked float panel -->
-        <div v-if="!loading && !docked" class="fst__css-float">
+        <div v-if="!loading && !docked" class="fst__css-float" :style="{ height: floatHeight + 'px' }">
+            <div class="fst__css-float-resize" @mousedown.prevent="startResize"></div>
             <div class="fst__css-float-header">
                 <div class="fst__css-float-title">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
@@ -402,6 +403,7 @@ export default {
             loading:     true,
             saving:      false,
             docked:      true,
+            floatHeight: 280,
             previewMode: 'light',
             previewHtml: '',
             styles: {
@@ -601,6 +603,21 @@ ${formHtml}
             });
             this.editorView.focus();
             this.debouncedRefresh();
+        },
+
+        startResize(e) {
+            const startY = e.clientY;
+            const startHeight = this.floatHeight;
+            const onMove = (e) => {
+                const delta = startY - e.clientY;
+                this.floatHeight = Math.max(160, Math.min(window.innerHeight * 0.85, startHeight + delta));
+            };
+            const onUp = () => {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+            };
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
         },
 
         async save() {
