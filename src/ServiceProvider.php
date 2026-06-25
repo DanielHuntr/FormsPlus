@@ -4,9 +4,11 @@ namespace App\FormsPlus;
 
 use App\FormsPlus\Fieldtypes\FormsPlusFieldtype;
 use App\FormsPlus\Listeners\HandleFormSubmission;
+use App\FormsPlus\Listeners\RejectHoneypotSubmission;
 use App\FormsPlus\Tags\FormsPlus;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\FormSubmitted;
+use Statamic\Events\FormSubmitting;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Form;
 use Statamic\Providers\AddonServiceProvider;
@@ -38,6 +40,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'forms-plus');
 
+        Event::listen(FormSubmitting::class, RejectHoneypotSubmission::class);
         Event::listen(FormSubmitted::class, HandleFormSubmission::class);
 
         Nav::extend(function ($nav) {
