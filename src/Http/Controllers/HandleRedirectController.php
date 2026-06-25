@@ -15,7 +15,14 @@ class HandleRedirectController extends Controller
 
         if ($redirectUrl && ! empty($params)) {
             $submission = session('submission');
-            $data       = $submission ? $submission->data()->all() : [];
+            if (is_array($submission)) {
+                $data = $submission;
+            } elseif (is_object($submission) && method_exists($submission, 'data')) {
+                $value = $submission->data();
+                $data  = is_array($value) ? $value : $value->all();
+            } else {
+                $data = [];
+            }
 
             $parts = [];
             foreach ($params as $param) {
