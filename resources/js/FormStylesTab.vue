@@ -679,6 +679,8 @@ body { padding: 28px; background: ${bodyBg}; font-family: -apple-system, BlinkMa
 .flexible-form__fieldset { border: none; padding: 0; margin: 0; }
 .flexible-form__submit { margin-top: 8px; }
 .flexible-form__required { color: red; }
+</style>
+<style type="text/tailwindcss">
 ${s.css || ''}
 </style>
 </head>
