@@ -35,7 +35,8 @@ class StylesController extends CpController
             'button'       => 'nullable|string|max:2000',
             'error'        => 'nullable|string|max:2000',
             'hint'         => 'nullable|string|max:2000',
-            'custom_css'   => 'nullable|string|max:20000',
+            'custom_css'         => 'nullable|string|max:20000',
+            'preview_stylesheet' => 'nullable|url|max:500',
         ]);
 
         StylesManager::save($request->only(array_keys(StylesManager::defaults())));

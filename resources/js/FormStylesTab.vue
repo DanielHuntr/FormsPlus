@@ -57,6 +57,13 @@
                         </div>
                     </div>
 
+                    <!-- Preview stylesheet -->
+                    <div class="fst__group">
+                        <div class="fst__group-title">Preview stylesheet</div>
+                        <p class="fst__hint">URL to your site's CSS file so custom properties (e.g. <code>var(--color-brand)</code>) resolve in the live preview. Not injected into the form itself.</p>
+                        <input v-model="styles.preview_stylesheet" type="url" class="fst__input" placeholder="e.g. /css/site.css" @input="debouncedRefresh">
+                    </div>
+
                     <!-- Custom CSS -->
                     <div class="fst__group">
                         <div class="fst__group-title-row">
@@ -275,6 +282,7 @@ export default {
                 form: '', wrapper: '', label: '', input: '', textarea: '',
                 select: '', checkbox: '', radio: '', choice_label: '',
                 button: '', error: '', hint: '', custom_css: '',
+                preview_stylesheet: '',
             },
             presets:          PRESETS,
             layoutElements:   ELEMENTS.layout,
@@ -470,6 +478,7 @@ export default {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.tailwindcss.com"><\/script>
 <script>tailwind.config = { darkMode: 'class' }<\/script>
+${s.preview_stylesheet ? `<link rel="stylesheet" href="${s.preview_stylesheet}">` : ''}
 <style>
 * { box-sizing: border-box; }
 body { padding: 28px; background: ${bodyBg}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; transition: background .2s; }

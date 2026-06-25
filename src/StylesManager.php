@@ -45,7 +45,8 @@ class StylesManager
             'button'       => '',
             'error'        => '',
             'hint'         => '',
-            'custom_css'   => '',
+            'custom_css'          => '',
+            'preview_stylesheet'  => '',
         ];
     }
 }
