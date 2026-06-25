@@ -209,9 +209,35 @@ Available style targets:
 | Error | Validation error messages |
 | Help text | Instruction text below labels |
 
+### CSS editor panel
+
+The **Custom CSS** section has a full CodeMirror editor with syntax highlighting. By default it sits inline in the sidebar. Click the **undock** button (top right of the editor) to pop it into a floating panel you can position anywhere on screen:
+
+| Panel position | How to activate |
+| --- | --- |
+| Bottom (default) | Click the bottom-dock icon in the floating panel header |
+| Top | Click the top-dock icon |
+| Left | Click the left-dock icon |
+| Right | Click the right-dock icon |
+| Detached window | Click the detach icon (window with traffic lights) |
+
+The detached window can be freely moved by dragging its title bar and resized from any edge or corner — matching the behaviour of a native OS window. Press **Cmd+S / Ctrl+S** at any time to save without leaving the editor.
+
+Click **Dock** in the panel header to return the editor to the sidebar.
+
+### Preview stylesheet
+
+Select a stylesheet from your `resources/css/` directory using the file picker in the Theme sidebar. Forms Plus proxies the file content server-side and injects it into the preview iframe so that:
+
+- CSS custom properties defined in your theme (e.g. `--color-button`) resolve correctly in the preview.
+- `@theme` blocks (Tailwind v4) are converted to `:root {}` declarations so `var()` references work.
+- Colour utilities derived from `@theme` (e.g. `bg-green`, `text-button`) are extracted and passed to the Tailwind CDN preview engine.
+
+The preview header has **Light** and **Dark** mode toggles so you can check both colour-scheme states without leaving the editor.
+
 ### Custom CSS
 
-The **Custom CSS** section in the theme editor accepts any CSS targeting the `.flexible-form` namespace. It is injected as a `<style>` block on the page. Click any class chip in the reference panel to insert a ready-made rule at your cursor.
+The editor accepts any CSS targeting the `.flexible-form` namespace. It is injected as a `<style>` block on every page that renders a form. Click any class chip in the reference panel to insert a ready-made rule at your cursor.
 
 **Full class reference:**
 
@@ -233,6 +259,35 @@ The **Custom CSS** section in the theme editor accepts any CSS targeting the `.f
 | `.flexible-form__input--error` | Input modifier when a field has a validation error |
 | `.flexible-form__button` | Submit button |
 | `.flexible-form__submit` | Submit button wrapper |
+
+### Using CSS custom properties
+
+If your theme defines custom properties (e.g. via Tailwind v4's `@theme`), you can reference them directly in the custom CSS editor:
+
+```css
+.flexible-form__button {
+    background: var(--color-button);
+    color: var(--color-button-foreground);
+}
+```
+
+The preview resolves these properties automatically as long as a preview stylesheet is selected.
+
+### Tailwind `@apply` and the CSS build pipeline
+
+`@apply` is a build-time feature — it cannot run in the browser. Forms Plus integrates with your existing Vite or npm build process to support it:
+
+1. When you save, Forms Plus writes your custom CSS to `resources/css/forms-plus.css`.
+2. If a preview stylesheet is selected, it automatically adds `@import './forms-plus.css';` to that file (after any existing `@import "tailwindcss"` line) so Tailwind picks it up during your next build.
+3. Click **Rebuild CSS** in the theme editor (or run the artisan command below) to trigger the build from within the CP.
+
+```bash
+php artisan forms-plus:build-css
+```
+
+This runs `vite build` (or `npm run build` as a fallback) using the same binary Vite uses in your project. After the build completes, `@apply` rules are live on the frontend.
+
+> **Note:** The preview iframe uses the Tailwind CDN and cannot run `@apply`. Use standard CSS properties or `var()` references for instant preview feedback, and rely on the build pipeline for final `@apply` output.
 
 ### Field widths
 
@@ -260,6 +315,14 @@ After pulling a new release, run:
 composer update danielhuntr/forms-plus
 php artisan optimize:clear
 ```
+
+---
+
+## Artisan Commands
+
+| Command | Description |
+| --- | --- |
+| `php artisan forms-plus:build-css` | Trigger a Vite / npm build to compile `@apply` rules from `resources/css/forms-plus.css` into your project's CSS output |
 
 ---
 
