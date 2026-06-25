@@ -567,9 +567,10 @@ export default {
                 css:                '',
                 preview_stylesheet: '',
             },
-            cssFiles:              [],
+            cssFiles:               [],
             previewStylesheetBase:  '',
             previewStylesheetTheme: '',
+            previewStylesheetColors: {},
             building:                false,
             presets: PRESETS,
             availableClasses: [
@@ -766,13 +767,22 @@ export default {
   </div>
 </form>`;
 
+            // Build Tailwind v3 config from extracted @theme colors so custom
+            // utilities like bg-green are available in the CDN preview
+            const twColors = {};
+            for (const [name, val] of Object.entries(this.previewStylesheetColors)) {
+                const ld = val.match(/light-dark\(\s*([^,]+),\s*([^)]+)\)/);
+                twColors[name] = ld ? (dark ? ld[2].trim() : ld[1].trim()) : val;
+            }
+            const twConfig = JSON.stringify({ darkMode: 'class', theme: { extend: { colors: twColors } } });
+
             this.previewHtml = `<!DOCTYPE html>
 <html${darkAttr}>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.tailwindcss.com"><\/script>
-<script>tailwind.config = { darkMode: 'class' }<\/script>
+<script>tailwind.config = ${twConfig}<\/script>
 ${this.previewStylesheetBase ? `<style>${this.previewStylesheetBase}</style>` : ''}
 <style>
 * { box-sizing: border-box; }
@@ -812,15 +822,16 @@ ${formHtml}
 
         async fetchPreviewStylesheet(url) {
             if (!url) {
-                this.previewStylesheetBase  = '';
-                this.previewStylesheetTheme = '';
+                this.previewStylesheetBase   = '';
+                this.previewStylesheetTheme  = '';
+                this.previewStylesheetColors = {};
                 return;
             }
-            // Find the matching file label (relative path within resources/css)
             const file = this.cssFiles.find(f => f.url === url);
             if (!file) {
-                this.previewStylesheetBase  = '';
-                this.previewStylesheetTheme = '';
+                this.previewStylesheetBase   = '';
+                this.previewStylesheetTheme  = '';
+                this.previewStylesheetColors = {};
                 return;
             }
             try {
@@ -828,32 +839,39 @@ ${formHtml}
                     this.cssContentUrl + '?file=' + encodeURIComponent(file.label)
                 );
                 const processed = this.processPreviewStylesheet(data);
-                this.previewStylesheetBase  = processed.base;
-                this.previewStylesheetTheme = processed.theme;
+                this.previewStylesheetBase   = processed.base;
+                this.previewStylesheetTheme  = processed.theme;
+                this.previewStylesheetColors = processed.colors;
             } catch {
-                this.previewStylesheetBase  = '';
-                this.previewStylesheetTheme = '';
+                this.previewStylesheetBase   = '';
+                this.previewStylesheetTheme  = '';
+                this.previewStylesheetColors = {};
             }
             this.debouncedRefresh();
         },
 
         processPreviewStylesheet(css) {
-            // Extract @theme blocks — injected into Tailwind CDN so custom utilities
-            // like bg-green resolve in the preview the same way they do after a build
             const themeBlocks = [];
+            const colors = {};
             const themeRe = /@theme(?:\s+\w+)?\s*\{([\s\S]*?)\}/g;
             let m;
             while ((m = themeRe.exec(css)) !== null) {
                 themeBlocks.push('@theme {' + m[1] + '}');
+                // Extract --color-* for Tailwind v3 CDN config
+                const colorRe = /--color-([\w-]+)\s*:\s*([^;]+);/g;
+                let cm;
+                while ((cm = colorRe.exec(m[1])) !== null) {
+                    colors[cm[1]] = cm[2].trim(); // store raw, e.g. light-dark(#aaa, #111)
+                }
             }
 
-            // Strip Tailwind-specific at-rules the browser can't handle
-            let base = css.replace(/@import\s+["']tailwindcss["'][^;]*;/g, '');
+            // Strip ALL @import lines — local ones (like ./forms-plus.css) cause 404s
+            // in the iframe because the browser resolves them relative to the CP URL
+            let base = css.replace(/@import\s+["'][^"']*["'][^;]*;/g, '');
             base = base.replace(/@(?:source|plugin)\s+[^{;]*(?:\{[^}]*\}|;)/g, '');
-            // Convert @theme → :root so CSS custom properties resolve as a fallback
             base = base.replace(/@theme(?:\s+\w+)?\s*\{([\s\S]*?)\}/g, (_, block) => ':root {' + block + '}');
 
-            return { base, theme: themeBlocks.join('\n') };
+            return { base, theme: themeBlocks.join('\n'), colors };
         },
 
         setDockPosition(pos) {
