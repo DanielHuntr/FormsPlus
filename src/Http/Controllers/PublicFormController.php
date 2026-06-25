@@ -78,7 +78,7 @@ class PublicFormController extends Controller
     private function resolveRedirect(string $handle, array $settings): string
     {
         if ($settings['on_submit'] === 'redirect' && ! empty($settings['redirect_url'])) {
-            return SettingsManager::resolveRedirectUrl($settings['redirect_url']);
+            return route('forms-plus.redirect', $handle);
         }
 
         // "message" mode — the Vue component passes its page URL as ?page_url=...

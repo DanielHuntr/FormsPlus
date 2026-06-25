@@ -1,14 +1,10 @@
 @php
-    $settings            = $settings ?? [];
-    $submitted           = $submitted ?? false;
-    $enabled             = $settings['enabled'] ?? true;
-    $submitLabel         = $submitLabel ?? $settings['submit_label'] ?? 'Submit';
-    $hasFile             = $fields->contains('type', 'files');
-    $fpFormId            = 'fp-form-' . substr(md5($actionUrl ?? uniqid()), 0, 8);
-    $redirectQueryParams = array_values(array_filter(
-        $settings['redirect_query_params'] ?? [],
-        fn($p) => !empty($p['key'])
-    ));
+    $settings    = $settings ?? [];
+    $submitted   = $submitted ?? false;
+    $enabled     = $settings['enabled'] ?? true;
+    $submitLabel = $submitLabel ?? $settings['submit_label'] ?? 'Submit';
+    $hasFile     = $fields->contains('type', 'files');
+    $fpFormId    = 'fp-form-' . substr(md5($actionUrl ?? uniqid()), 0, 8);
 @endphp
 
 {!! \App\FormsPlus\StylesManager::renderStyles() !!}
@@ -30,7 +26,6 @@
 {{-- Normal form --}}
 @else
     <form
-        id="{{ $fpFormId }}"
         action="{{ $actionUrl }}"
         method="POST"
         class="flexible-form"
@@ -209,26 +204,4 @@
         </div>
     </form>
 
-    @if (!empty($redirectQueryParams) && !empty($redirect))
-    <script>
-    (function () {
-        var form = document.getElementById('{{ $fpFormId }}');
-        if (!form) return;
-        var params = @json($redirectQueryParams);
-        var baseUrl = @json($redirect);
-        form.addEventListener('submit', function () {
-            var fd = new FormData(this);
-            var parts = params.map(function (p) {
-                var val = (p.value || '').replace(/\{\{([\w-]+)\}\}/g, function (_, h) {
-                    return fd.get(h) || '';
-                });
-                return encodeURIComponent(p.key) + '=' + encodeURIComponent(val);
-            });
-            var sep = baseUrl.indexOf('?') >= 0 ? '&' : '?';
-            var redir = form.querySelector('[name="_redirect"]');
-            if (redir) redir.value = baseUrl + sep + parts.join('&');
-        });
-    }());
-    </script>
-    @endif
 @endif

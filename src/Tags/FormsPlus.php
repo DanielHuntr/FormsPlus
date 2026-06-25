@@ -43,7 +43,7 @@ class FormsPlus extends Tags
         }
 
         if ($settings['on_submit'] === 'redirect' && ! empty($settings['redirect_url'])) {
-            return SettingsManager::resolveRedirectUrl($settings['redirect_url']);
+            return route('forms-plus.redirect', $handle);
         }
 
         // "message" mode — redirect back to this page with a submitted flag
