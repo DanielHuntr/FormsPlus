@@ -2,6 +2,7 @@
 
 namespace App\FormsPlus\Http\Controllers;
 
+use App\FormsPlus\Services\CssBuildService;
 use App\FormsPlus\StylesManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -19,6 +20,11 @@ class StylesController extends CpController
     public function show()
     {
         return response()->json(StylesManager::get());
+    }
+
+    public function buildCss(CssBuildService $builder)
+    {
+        return response()->json($builder->build());
     }
 
     public function cssFileContent(Request $request)

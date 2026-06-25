@@ -2,6 +2,7 @@
 
 namespace App\FormsPlus;
 
+use App\FormsPlus\Console\BuildCssCommand;
 use App\FormsPlus\Fieldtypes\FormsPlusFieldtype;
 use App\FormsPlus\Listeners\HandleFormSubmission;
 use App\FormsPlus\Listeners\RejectHoneypotSubmission;
@@ -15,6 +16,10 @@ use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
+    protected $commands = [
+        BuildCssCommand::class,
+    ];
+
     protected $tags = [
         FormsPlus::class,
     ];

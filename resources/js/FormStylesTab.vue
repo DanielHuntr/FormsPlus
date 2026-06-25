@@ -90,6 +90,17 @@
                         <button class="ff-btn ff-btn--primary" :disabled="saving" @click="save">
                             {{ saving ? 'Saving…' : 'Save Styles' }}
                         </button>
+                        <button
+                            v-if="cssFiles.length"
+                            class="fst__build-btn"
+                            :disabled="building"
+                            @click="buildCss"
+                            title="Compile forms-plus.css through your Vite build pipeline so @apply rules take effect"
+                        >
+                            <svg v-if="!building" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                            <svg v-else width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fst__spin"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
+                            {{ building ? 'Building…' : 'Rebuild CSS' }}
+                        </button>
                     </div>
                 </div>
             </aside>
@@ -529,6 +540,7 @@ export default {
         stylesSaveUrl: { type: String, required: true },
         cssFilesUrl:   { type: String, required: true },
         cssContentUrl: { type: String, required: true },
+        buildCssUrl:   { type: String, required: true },
     },
 
     data() {
@@ -548,6 +560,7 @@ export default {
             },
             cssFiles:                [],
             previewStylesheetContent: '',
+            building:                false,
             presets: PRESETS,
             availableClasses: [
                 { name: 'flexible-form',               description: 'The <form> element' },
@@ -835,6 +848,22 @@ ${formHtml}
             };
             document.addEventListener('mousemove', onMove);
             document.addEventListener('mouseup', onUp);
+        },
+
+        async buildCss() {
+            this.building = true;
+            try {
+                const { data } = await this.$axios.post(this.buildCssUrl);
+                if (data.success) {
+                    this.$toast.success('CSS rebuilt — @apply rules are now live.');
+                } else {
+                    this.$toast.error(data.message || 'Build failed.');
+                }
+            } catch {
+                this.$toast.error('Could not run build. Is Node.js available on this server?');
+            } finally {
+                this.building = false;
+            }
         },
 
         async save() {
