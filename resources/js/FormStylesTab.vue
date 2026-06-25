@@ -142,7 +142,11 @@
         <div v-if="!loading && !docked" class="fst__css-float" :class="'fst__css-float--' + dockPosition" :style="floatStyle">
             <div class="fst__css-float-resize" :style="resizeHandleStyle" @mousedown.prevent="startResize"></div>
             <div class="fst__css-float-header">
-                <div class="fst__css-float-title">
+                <div
+                    class="fst__css-float-title"
+                    :class="{ 'fst__css-float-title--draggable': dockPosition === 'detached' }"
+                    @mousedown.prevent="dockPosition === 'detached' ? startDrag($event) : null"
+                >
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
                     CSS
                 </div>
@@ -158,6 +162,9 @@
                     </button>
                     <button class="fst__css-float-pos-btn" :class="{ 'fst__css-float-pos-btn--active': dockPosition === 'right' }" @click="setDockPosition('right')" title="Dock to right">
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1"/><rect x="9" y="2" width="4" height="10" rx="0.5" fill="currentColor"/></svg>
+                    </button>
+                    <button class="fst__css-float-pos-btn" :class="{ 'fst__css-float-pos-btn--active': dockPosition === 'detached' }" @click="setDockPosition('detached')" title="Detach as floating window">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1"/><line x1="1" y1="5" x2="13" y2="5" stroke="currentColor" stroke-width="1"/><circle cx="3.2" cy="3.5" r="0.7" fill="currentColor"/><circle cx="5.4" cy="3.5" r="0.7" fill="currentColor"/></svg>
                     </button>
                 </div>
                 <button class="fst__css-float-dock-btn" @click="toggleDock">
@@ -549,8 +556,10 @@ export default {
             saving:       false,
             docked:       true,
             dockPosition: 'bottom',
-            floatHeight:  280,
-            floatWidth:   400,
+            floatHeight:  380,
+            floatWidth:   480,
+            floatX:       120,
+            floatY:       80,
             cssMode:      'plain',
             previewMode: 'light',
             previewHtml: '',
@@ -592,6 +601,14 @@ export default {
     computed: {
         floatStyle() {
             const pos = this.dockPosition;
+            if (pos === 'detached') {
+                return {
+                    left:   this.floatX + 'px',
+                    top:    this.floatY + 'px',
+                    width:  this.floatWidth + 'px',
+                    height: this.floatHeight + 'px',
+                };
+            }
             if (pos === 'left' || pos === 'right') {
                 return { width: this.floatWidth + 'px' };
             }
@@ -599,10 +616,11 @@ export default {
         },
         resizeHandleStyle() {
             switch (this.dockPosition) {
-                case 'bottom': return { top: 0,    left: 0, right: 0,             height: '5px', cursor: 'ns-resize' };
-                case 'top':    return { bottom: 0, left: 0, right: 0,             height: '5px', cursor: 'ns-resize' };
-                case 'left':   return { top: 0, bottom: 0,            right: 0,   width:  '5px', cursor: 'ew-resize' };
-                case 'right':  return { top: 0, bottom: 0,            left:  0,   width:  '5px', cursor: 'ew-resize' };
+                case 'bottom':   return { top: 0,    left: 0,    right: 0,  height: '5px',  cursor: 'ns-resize' };
+                case 'top':      return { bottom: 0, left: 0,    right: 0,  height: '5px',  cursor: 'ns-resize' };
+                case 'left':     return { top: 0,    bottom: 0,  right: 0,  width:  '5px',  cursor: 'ew-resize' };
+                case 'right':    return { top: 0,    bottom: 0,  left: 0,   width:  '5px',  cursor: 'ew-resize' };
+                case 'detached': return { bottom: 0, right: 0,  width: '14px', height: '14px', cursor: 'nwse-resize' };
                 default: return {};
             }
         },
@@ -822,17 +840,52 @@ ${formHtml}
         },
 
         setDockPosition(pos) {
+            if (pos === 'detached' && this.dockPosition !== 'detached') {
+                this.floatX = Math.max(20, Math.round((window.innerWidth  - this.floatWidth)  / 2));
+                this.floatY = Math.max(70, Math.round((window.innerHeight - this.floatHeight) / 2));
+            }
             this.dockPosition = pos;
+        },
+
+        startDrag(e) {
+            const originX = e.clientX - this.floatX;
+            const originY = e.clientY - this.floatY;
+            const onMove = (e) => {
+                this.floatX = Math.max(0, Math.min(window.innerWidth  - this.floatWidth,  e.clientX - originX));
+                this.floatY = Math.max(54, Math.min(window.innerHeight - 60,               e.clientY - originY));
+            };
+            const onUp = () => {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+            };
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
         },
 
         startResize(e) {
             const pos = this.dockPosition;
+
+            if (pos === 'detached') {
+                const startX = e.clientX, startY = e.clientY;
+                const startW = this.floatWidth, startH = this.floatHeight;
+                const onMove = (e) => {
+                    this.floatWidth  = Math.max(300, Math.min(window.innerWidth  * 0.85, startW + (e.clientX - startX)));
+                    this.floatHeight = Math.max(200, Math.min(window.innerHeight * 0.85, startH + (e.clientY - startY)));
+                };
+                const onUp = () => {
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+                return;
+            }
+
             const isVertical = pos === 'top' || pos === 'bottom';
             const startPos  = isVertical ? e.clientY : e.clientX;
             const startSize = isVertical ? this.floatHeight : this.floatWidth;
             const onMove = (e) => {
                 const current = isVertical ? e.clientY : e.clientX;
-                // bottom/right: dragging toward center grows the panel
                 const delta = (pos === 'bottom' || pos === 'right')
                     ? startPos - current
                     : current - startPos;
