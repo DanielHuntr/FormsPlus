@@ -821,6 +821,9 @@
 .fst__hint strong { font-weight: 600; color: var(--color-grey-80, #374151); }
 .fst__hint--warn { color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 5px; padding: 6px 10px; }
 .fst__hint--warn strong { color: #78350f; }
+.fst__hint--info { color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 5px; padding: 6px 10px; }
+.fst__hint--info strong { color: #1e3a8a; }
+.fst__hint--info code { background: #dbeafe; }
 
 /* Toggle switch */
 .fst__toggle-row {

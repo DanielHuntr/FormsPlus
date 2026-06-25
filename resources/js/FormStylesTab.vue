@@ -13,11 +13,11 @@
                             <span class="fst__group-title fst__group-title--bare">Preset themes</span>
                             <div class="fst__mode-toggle">
                                 <button class="fst__mode-btn" :class="{ 'fst__mode-btn--active': cssMode === 'plain' }" @click="cssMode = 'plain'" title="Plain CSS — works everywhere, no build step needed">Plain CSS</button>
-                                <button class="fst__mode-btn" :class="{ 'fst__mode-btn--active': cssMode === 'tailwind' }" @click="cssMode = 'tailwind'" title="@apply syntax — copy into your Tailwind source CSS and run through your build pipeline">Tailwind ref</button>
+                                <button class="fst__mode-btn" :class="{ 'fst__mode-btn--active': cssMode === 'tailwind' }" @click="cssMode = 'tailwind'" title="Load presets using Tailwind @apply — requires your Tailwind build pipeline">Tailwind</button>
                             </div>
                         </div>
-                        <p v-if="cssMode === 'tailwind'" class="fst__hint fst__hint--warn">
-                            <strong>@apply does not work at runtime.</strong> Use this as a reference to copy into your site's CSS source file and process through your Tailwind build pipeline. For direct use, switch to Plain CSS.
+                        <p v-if="cssMode === 'tailwind'" class="fst__hint fst__hint--info">
+                            After saving, click <strong>Rebuild CSS</strong> to compile <code>@apply</code> through your Tailwind pipeline.
                         </p>
                         <div class="fst__presets">
                             <button
@@ -63,7 +63,7 @@
                                 <svg v-else xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/></svg>
                             </button>
                         </div>
-                        <p class="fst__hint">Write plain CSS — it is output directly into a <code>&lt;style&gt;</code> tag on every page with a form. <code>@apply</code> will not work here; use Plain CSS presets instead. Click a class chip to insert a selector.</p>
+                        <p class="fst__hint">Plain CSS works immediately. <code>@apply</code> works if you select a stylesheet above and click <strong>Rebuild CSS</strong> after saving. Click a class chip to insert a selector.</p>
 
                         <div v-show="docked" ref="cssEditorMount" class="fst__css-editor"></div>
                         <div v-if="!docked" class="fst__css-editor-placeholder">
