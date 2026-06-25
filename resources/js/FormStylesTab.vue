@@ -9,7 +9,13 @@
 
                     <!-- Preset picker -->
                     <div class="fst__group">
-                        <div class="fst__group-title">Preset themes</div>
+                        <div class="fst__group-title-row">
+                            <span class="fst__group-title fst__group-title--bare">Preset themes</span>
+                            <div class="fst__mode-toggle">
+                                <button class="fst__mode-btn" :class="{ 'fst__mode-btn--active': cssMode === 'plain' }" @click="cssMode = 'plain'" title="Load presets as plain CSS">Plain CSS</button>
+                                <button class="fst__mode-btn" :class="{ 'fst__mode-btn--active': cssMode === 'tailwind' }" @click="cssMode = 'tailwind'" title="Load presets using Tailwind @apply">Tailwind</button>
+                            </div>
+                        </div>
                         <div class="fst__presets">
                             <button
                                 v-for="preset in presets"
@@ -130,6 +136,27 @@ const PRESETS = [
     {
         id: 'default',
         label: 'Default',
+        cssTailwind: `.flexible-form__field {
+    @apply mb-5;
+}
+.flexible-form__label {
+    @apply block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300;
+}
+.flexible-form__input {
+    @apply w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500;
+}
+.flexible-form__check-label {
+    @apply flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300;
+}
+.flexible-form__button {
+    @apply inline-flex items-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors dark:bg-blue-500 dark:hover:bg-blue-400;
+}
+.flexible-form__error-msg {
+    @apply mt-1 text-sm text-red-600 dark:text-red-400;
+}
+.flexible-form__instructions {
+    @apply mt-0.5 text-xs text-gray-500 dark:text-gray-400;
+}`,
         css: `.flexible-form__field {
     margin-bottom: 1.25rem;
 }
@@ -193,6 +220,27 @@ const PRESETS = [
     {
         id: 'minimal',
         label: 'Minimal',
+        cssTailwind: `.flexible-form__field {
+    @apply mb-6;
+}
+.flexible-form__label {
+    @apply block text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2 dark:text-gray-400;
+}
+.flexible-form__input {
+    @apply w-full border-0 border-b-2 border-gray-200 bg-transparent px-0 py-2 text-sm text-gray-900 placeholder-gray-300 focus:border-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-white;
+}
+.flexible-form__check-label {
+    @apply flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300;
+}
+.flexible-form__button {
+    @apply inline-flex items-center border-2 border-gray-900 bg-transparent px-5 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-900 hover:text-white focus:outline-none transition-colors dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-gray-900;
+}
+.flexible-form__error-msg {
+    @apply mt-1 text-xs text-red-500 dark:text-red-400;
+}
+.flexible-form__instructions {
+    @apply mt-0.5 text-xs text-gray-400;
+}`,
         css: `.flexible-form__field {
     margin-bottom: 1.5rem;
 }
@@ -256,6 +304,30 @@ const PRESETS = [
     {
         id: 'rounded',
         label: 'Rounded',
+        cssTailwind: `.flexible-form__field {
+    @apply mb-5;
+}
+.flexible-form__label {
+    @apply block text-sm font-semibold text-gray-800 mb-1.5 dark:text-gray-200;
+}
+.flexible-form__input {
+    @apply w-full rounded-full border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500;
+}
+.flexible-form__textarea {
+    @apply rounded-2xl;
+}
+.flexible-form__check-label {
+    @apply flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300;
+}
+.flexible-form__button {
+    @apply inline-flex items-center rounded-full bg-blue-500 px-6 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-colors dark:bg-blue-600 dark:hover:bg-blue-500;
+}
+.flexible-form__error-msg {
+    @apply mt-1.5 text-sm text-red-500 dark:text-red-400;
+}
+.flexible-form__instructions {
+    @apply mt-1 text-xs text-gray-400 dark:text-gray-500;
+}`,
         css: `.flexible-form__field {
     margin-bottom: 1.25rem;
 }
@@ -323,6 +395,31 @@ const PRESETS = [
     {
         id: 'dark',
         label: 'Dark',
+        cssTailwind: `.flexible-form {
+    @apply bg-gray-950 p-8 rounded-xl;
+    color-scheme: dark;
+}
+.flexible-form__field {
+    @apply mb-5;
+}
+.flexible-form__label {
+    @apply block text-sm font-medium text-gray-300 mb-1;
+}
+.flexible-form__input {
+    @apply w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500;
+}
+.flexible-form__check-label {
+    @apply flex items-center gap-2 text-sm text-gray-300;
+}
+.flexible-form__button {
+    @apply inline-flex items-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-950 transition-colors;
+}
+.flexible-form__error-msg {
+    @apply mt-1 text-sm text-red-400;
+}
+.flexible-form__instructions {
+    @apply mt-1 text-xs text-gray-500;
+}`,
         css: `.flexible-form {
     background: #030712;
     padding: 2rem;
@@ -404,6 +501,7 @@ export default {
             saving:      false,
             docked:      true,
             floatHeight: 280,
+            cssMode:     'plain',
             previewMode: 'light',
             previewHtml: '',
             styles: {
@@ -496,11 +594,12 @@ export default {
         },
 
         applyPreset(preset) {
-            this.styles.css = preset.css;
+            const css = this.cssMode === 'tailwind' ? preset.cssTailwind : preset.css;
+            this.styles.css = css;
             if (this.editorView) {
                 const current = this.editorView.state.doc.toString();
-                if (current !== preset.css) {
-                    this.editorView.dispatch({ changes: { from: 0, to: current.length, insert: preset.css } });
+                if (current !== css) {
+                    this.editorView.dispatch({ changes: { from: 0, to: current.length, insert: css } });
                 }
             }
             this.refreshPreview();
