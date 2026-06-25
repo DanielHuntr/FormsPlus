@@ -864,45 +864,47 @@
 }
 
 /* ── Float panel (undocked, fixed bottom) ── */
+/* Resize handle — position/cursor applied via inline style from Vue */
 .fst__css-float-resize {
-    height: 5px;
-    flex-shrink: 0;
-    cursor: ns-resize;
+    position: absolute;
     background: transparent;
     transition: background .15s;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.fst__css-float-resize::after {
-    content: '';
-    display: block;
-    width: 40px;
-    height: 2px;
-    border-radius: 1px;
-    background: rgba(255,255,255,.15);
-    transition: background .15s;
-}
 .fst__css-float-resize:hover { background: rgba(59,130,246,.25); }
+.fst__css-float--bottom .fst__css-float-resize::after,
+.fst__css-float--top    .fst__css-float-resize::after {
+    content: ''; display: block; width: 40px; height: 2px;
+    border-radius: 1px; background: rgba(255,255,255,.15); transition: background .15s;
+}
+.fst__css-float--left  .fst__css-float-resize::after,
+.fst__css-float--right .fst__css-float-resize::after {
+    content: ''; display: block; width: 2px; height: 40px;
+    border-radius: 1px; background: rgba(255,255,255,.15); transition: background .15s;
+}
 .fst__css-float-resize:hover::after { background: #3b82f6; }
 
 .fst__css-float {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
     display: flex;
     flex-direction: column;
     background: #1e1e1e;
-    border-top: 2px solid #3b82f6;
-    box-shadow: 0 -8px 32px rgba(0,0,0,.4);
     z-index: 9500;
 }
+.fst__css-float--bottom { bottom: 0; left: 0; right: 0;  border-top:    2px solid #3b82f6; box-shadow:  0 -8px 32px rgba(0,0,0,.4); }
+.fst__css-float--top    { top: 0;    left: 0; right: 0;  border-bottom: 2px solid #3b82f6; box-shadow:  0  8px 32px rgba(0,0,0,.4); }
+.fst__css-float--left   { top: 0; bottom: 0; left: 0;    border-right:  2px solid #3b82f6; box-shadow:  8px 0  32px rgba(0,0,0,.4); }
+.fst__css-float--right  { top: 0; bottom: 0; right: 0;   border-left:   2px solid #3b82f6; box-shadow: -8px 0  32px rgba(0,0,0,.4); }
+
 .fst__css-float-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 16px;
+    gap: 8px;
+    padding: 8px 12px;
     background: #252526;
     border-bottom: 1px solid #383838;
     flex-shrink: 0;
@@ -914,7 +916,28 @@
     font-size: 0.8125rem;
     font-weight: 600;
     color: #cccccc;
+    flex: 1;
 }
+.fst__css-float-positions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+.fst__css-float-pos-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #606060;
+    cursor: pointer;
+    transition: background .1s, color .1s, border-color .1s;
+}
+.fst__css-float-pos-btn:hover { background: #3a3a3a; color: #cccccc; border-color: #555; }
+.fst__css-float-pos-btn--active { background: #1e3459; color: #3b82f6; border-color: #3b82f6; }
 .fst__css-float-dock-btn {
     display: flex;
     align-items: center;
@@ -928,9 +951,10 @@
     border-radius: 4px;
     cursor: pointer;
     transition: background .1s, color .1s;
+    flex-shrink: 0;
 }
 .fst__css-float-dock-btn:hover { background: #4a4a4a; color: #eeeeee; }
-.fst__css-float-body { flex: 1; overflow: hidden; }
+.fst__css-float-body { flex: 1; overflow: hidden; min-height: 0; min-width: 0; }
 .fst__css-float-body .cm-editor { height: 100%; }
 .fst__css-float-body .cm-scroller { overflow: auto; }
 
