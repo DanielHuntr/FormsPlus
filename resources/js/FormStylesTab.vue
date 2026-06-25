@@ -567,8 +567,9 @@ export default {
                 css:                '',
                 preview_stylesheet: '',
             },
-            cssFiles:                [],
-            previewStylesheetContent: '',
+            cssFiles:              [],
+            previewStylesheetBase:  '',
+            previewStylesheetTheme: '',
             building:                false,
             presets: PRESETS,
             availableClasses: [
@@ -772,7 +773,7 @@ export default {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.tailwindcss.com"><\/script>
 <script>tailwind.config = { darkMode: 'class' }<\/script>
-${this.previewStylesheetContent ? `<style>${this.previewStylesheetContent}</style>` : ''}
+${this.previewStylesheetBase ? `<style>${this.previewStylesheetBase}</style>` : ''}
 <style>
 * { box-sizing: border-box; }
 body { padding: 28px; background: ${bodyBg}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
@@ -783,6 +784,7 @@ body { padding: 28px; background: ${bodyBg}; font-family: -apple-system, BlinkMa
 .flexible-form__required { color: red; }
 </style>
 <style type="text/tailwindcss">
+${this.previewStylesheetTheme || ''}
 ${s.css || ''}
 </style>
 </head>
@@ -810,33 +812,48 @@ ${formHtml}
 
         async fetchPreviewStylesheet(url) {
             if (!url) {
-                this.previewStylesheetContent = '';
+                this.previewStylesheetBase  = '';
+                this.previewStylesheetTheme = '';
                 return;
             }
             // Find the matching file label (relative path within resources/css)
             const file = this.cssFiles.find(f => f.url === url);
             if (!file) {
-                this.previewStylesheetContent = '';
+                this.previewStylesheetBase  = '';
+                this.previewStylesheetTheme = '';
                 return;
             }
             try {
                 const { data } = await this.$axios.get(
                     this.cssContentUrl + '?file=' + encodeURIComponent(file.label)
                 );
-                this.previewStylesheetContent = this.processPreviewStylesheet(data);
+                const processed = this.processPreviewStylesheet(data);
+                this.previewStylesheetBase  = processed.base;
+                this.previewStylesheetTheme = processed.theme;
             } catch {
-                this.previewStylesheetContent = '';
+                this.previewStylesheetBase  = '';
+                this.previewStylesheetTheme = '';
             }
             this.debouncedRefresh();
         },
 
         processPreviewStylesheet(css) {
-            // Strip Tailwind-specific imports the browser can't resolve
-            let out = css.replace(/@import\s+["']tailwindcss["'][^;]*;/g, '');
-            out = out.replace(/@(?:source|plugin)\s+[^{;]*(?:\{[^}]*\}|;)/g, '');
-            // Convert Tailwind v4 @theme { } → :root { } so CSS custom props resolve in browser
-            out = out.replace(/@theme(?:\s+\w+)?\s*\{([\s\S]*?)\}/g, (_, block) => ':root {' + block + '}');
-            return out;
+            // Extract @theme blocks — injected into Tailwind CDN so custom utilities
+            // like bg-green resolve in the preview the same way they do after a build
+            const themeBlocks = [];
+            const themeRe = /@theme(?:\s+\w+)?\s*\{([\s\S]*?)\}/g;
+            let m;
+            while ((m = themeRe.exec(css)) !== null) {
+                themeBlocks.push('@theme {' + m[1] + '}');
+            }
+
+            // Strip Tailwind-specific at-rules the browser can't handle
+            let base = css.replace(/@import\s+["']tailwindcss["'][^;]*;/g, '');
+            base = base.replace(/@(?:source|plugin)\s+[^{;]*(?:\{[^}]*\}|;)/g, '');
+            // Convert @theme → :root so CSS custom properties resolve as a fallback
+            base = base.replace(/@theme(?:\s+\w+)?\s*\{([\s\S]*?)\}/g, (_, block) => ':root {' + block + '}');
+
+            return { base, theme: themeBlocks.join('\n') };
         },
 
         setDockPosition(pos) {
