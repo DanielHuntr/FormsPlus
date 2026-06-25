@@ -24,7 +24,7 @@ class StylesController extends CpController
     {
         $request->validate([
             'css'                => 'nullable|string|max:50000',
-            'preview_stylesheet' => 'nullable|url|max:500',
+            'preview_stylesheet' => 'nullable|string|max:500',
         ]);
 
         StylesManager::save($request->only(array_keys(StylesManager::defaults())));

@@ -25,7 +25,7 @@
                     <div class="fst__group">
                         <div class="fst__group-title">Preview stylesheet</div>
                         <p class="fst__hint">URL to your site's CSS so custom properties (e.g. <code>var(--color-brand)</code>) resolve in the live preview. Not injected into the form itself.</p>
-                        <input v-model="styles.preview_stylesheet" type="url" class="fst__input" placeholder="e.g. /css/site.css" @input="debouncedRefresh">
+                        <input v-model="styles.preview_stylesheet" type="text" class="fst__input" placeholder="e.g. /css/site.css" @input="debouncedRefresh">
                     </div>
 
                     <!-- CSS editor -->
