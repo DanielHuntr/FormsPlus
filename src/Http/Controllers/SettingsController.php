@@ -39,6 +39,9 @@ class SettingsController extends CpController
             'success_title'              => 'sometimes|nullable|string|max:255',
             'success_message'            => 'sometimes|nullable|string|max:2000',
             'redirect_url'               => 'sometimes|nullable|string|max:2000',
+            'redirect_query_params'      => 'sometimes|array',
+            'redirect_query_params.*.key'   => 'sometimes|string|max:100',
+            'redirect_query_params.*.value' => 'sometimes|string|max:500',
         ]);
 
         // Merge so a partial save (e.g. only submit-button fields) doesn't wipe other keys.

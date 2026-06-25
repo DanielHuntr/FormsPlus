@@ -403,6 +403,74 @@
 }
 .ff-editor__body { padding: 1.25rem 1.375rem; }
 
+/* ---- Query parameter builder ---- */
+.ff-qp-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 6px;
+}
+.ff-qp-row {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr auto;
+    gap: 5px;
+    align-items: start;
+}
+.ff-qp-row--header span {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--color-grey-50, #9ca3af);
+    padding: 0 2px;
+}
+.ff-qp-value-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.ff-qp-input {
+    font-size: 0.8125rem !important;
+    padding: 5px 7px !important;
+    font-family: monospace;
+}
+.ff-qp-field-select {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+    border: 1px solid var(--color-grey-25, #d1d5db);
+    border-radius: 4px;
+    background: #fff;
+    color: var(--color-grey-60, #6b7280);
+    cursor: pointer;
+    width: 100%;
+}
+.ff-qp-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: none;
+    color: var(--color-grey-40, #9ca3af);
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.ff-qp-remove:hover { background: #fee2e2; color: #dc2626; }
+.ff-qp-preview {
+    margin-top: 8px;
+    padding: 7px 10px;
+    background: var(--color-grey-5, #f9fafb);
+    border: 1px solid var(--color-grey-20, #e5e7eb);
+    border-radius: 5px;
+    word-break: break-all;
+    font-size: 0.75rem;
+    color: var(--color-grey-60, #6b7280);
+}
+.ff-qp-preview strong { color: var(--color-grey-70, #4b5563); }
+
 /* ---- Tab navigation ---- */
 .ff-header { margin-bottom: 0.75rem; }
 .ff-tabs {
@@ -1342,6 +1410,12 @@
 .dark .ff-submit-node__label { color: #93c5fd; }
 .dark .ff-submit-node__meta { color: #71717a; }
 .dark .ff-submit-node__badge { background: #1e2a3a; border-color: #3b82f6; color: #60a5fa; }
+.dark .ff-qp-row--header span { color: #52525b; }
+.dark .ff-qp-field-select { background: #27272a; border-color: #3f3f46; color: #a1a1aa; }
+.dark .ff-qp-remove { color: #52525b; }
+.dark .ff-qp-remove:hover { background: #450a0a; color: #f87171; }
+.dark .ff-qp-preview { background: #18181b; border-color: #3f3f46; color: #71717a; }
+.dark .ff-qp-preview strong { color: #a1a1aa; }
 
 /* ── Settings sections ── */
 .dark .ff-settings__section { background: #27272a; border-color: #3f3f46; box-shadow: none; }

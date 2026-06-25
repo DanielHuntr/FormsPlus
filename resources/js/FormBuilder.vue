@@ -180,8 +180,62 @@
                         <template v-if="submitBtn.on_submit === 'redirect'">
                             <div class="ff-field">
                                 <label class="ff-label">Redirect URL</label>
-                                <input v-model="submitBtn.redirect_url" type="text" class="ff-input" placeholder="https://example.com/page?ref=signup">
-                                <p class="ff-hint">Full URLs with query parameters are supported, e.g. <code>?email=user@example.com</code>.</p>
+                                <input v-model="submitBtn.redirect_url" type="text" class="ff-input" placeholder="https://example.com/page">
+                            </div>
+
+                            <div class="ff-field">
+                                <label class="ff-label">Query Parameters</label>
+
+                                <div v-if="submitBtn.redirect_query_params.length" class="ff-qp-list">
+                                    <div class="ff-qp-row ff-qp-row--header">
+                                        <span>Key</span>
+                                        <span>Value</span>
+                                        <span></span>
+                                    </div>
+                                    <div v-for="(param, i) in submitBtn.redirect_query_params" :key="i" class="ff-qp-row">
+                                        <input
+                                            v-model="param.key"
+                                            type="text"
+                                            class="ff-input ff-qp-input"
+                                            placeholder="email"
+                                        >
+                                        <div class="ff-qp-value-wrap">
+                                            <input
+                                                v-model="param.value"
+                                                type="text"
+                                                class="ff-input ff-qp-input"
+                                                placeholder="{{email}}"
+                                            >
+                                            <select v-if="fields.length" @change="insertHandle(i, $event)" class="ff-qp-field-select">
+                                                <option value="">Field…</option>
+                                                <option v-for="f in fields" :key="f.handle" :value="f.handle">
+                                                    {{ f.display || f.handle }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            class="ff-qp-remove"
+                                            @click="submitBtn.redirect_query_params.splice(i, 1)"
+                                            title="Remove"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="ff-btn ff-btn--ghost ff-btn--sm"
+                                    style="margin-top:4px;"
+                                    @click="submitBtn.redirect_query_params.push({ key: '', value: '' })"
+                                >
+                                    + Add parameter
+                                </button>
+
+                                <p v-if="previewRedirectUrl" class="ff-hint ff-qp-preview">
+                                    <strong>Preview:</strong><br>{{ previewRedirectUrl }}
+                                </p>
                             </div>
                         </template>
 
@@ -347,11 +401,12 @@ export default {
             activeIndex:     null,
             submitBtnActive: false,
             submitBtn: {
-                submit_label:    'Submit',
-                on_submit:       'message',
-                success_title:   'Message sent!',
-                success_message: "Thank you for getting in touch. We'll be in touch soon.",
-                redirect_url:    '',
+                submit_label:          'Submit',
+                on_submit:             'message',
+                success_title:         'Message sent!',
+                success_message:       "Thank you for getting in touch. We'll be in touch soon.",
+                redirect_url:          '',
+                redirect_query_params: [],
             },
             saving:        false,
             isDirty:       false,
@@ -377,6 +432,14 @@ export default {
 
         antlersTag() {
             return `{{ forms_plus handle="${this.form.handle}" }}`;
+        },
+
+        previewRedirectUrl() {
+            if (this.submitBtn.on_submit !== 'redirect' || !this.submitBtn.redirect_url) return '';
+            const params = (this.submitBtn.redirect_query_params || []).filter(p => p.key.trim());
+            if (!params.length) return '';
+            const sep = this.submitBtn.redirect_url.includes('?') ? '&' : '?';
+            return this.submitBtn.redirect_url + sep + params.map(p => `${p.key}=${p.value || ''}`).join('&');
         },
     },
 
@@ -431,7 +494,7 @@ export default {
         async loadSubmitBtn() {
             try {
                 const { data } = await this.$axios.get(this.settingsUrl);
-                const keys = ['submit_label', 'on_submit', 'success_title', 'success_message', 'redirect_url'];
+                const keys = ['submit_label', 'on_submit', 'success_title', 'success_message', 'redirect_url', 'redirect_query_params'];
                 keys.forEach(k => { if (data[k] !== undefined) this.submitBtn[k] = data[k]; });
             } catch {
                 // keep defaults
@@ -525,6 +588,13 @@ export default {
         async saveFields() {
             const { data } = await this.$axios.post(this.saveUrl, { fields: this.fields });
             if (!data.success) throw new Error('Fields save failed');
+        },
+
+        insertHandle(paramIndex, event) {
+            const handle = event.target.value;
+            if (!handle) return;
+            this.submitBtn.redirect_query_params[paramIndex].value = `{{${handle}}}`;
+            event.target.value = '';
         },
 
         onDragStart(index) { this.dragIndex = index; },

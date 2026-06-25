@@ -75,6 +75,7 @@ class SettingsManager
             'success_title'                     => 'Message sent!',
             'success_message'                   => "Thank you for getting in touch. We'll be in touch soon.",
             'redirect_url'                      => '',
+            'redirect_query_params'             => [],
             'use_default_notification_template' => true,
             'use_default_confirmation_template' => true,
             'confirmation_email_enabled'        => false,
