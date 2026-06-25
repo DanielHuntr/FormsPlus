@@ -885,57 +885,64 @@ ${formHtml}
         startDrag(e) {
             const originX = e.clientX - this.floatX;
             const originY = e.clientY - this.floatY;
-            const onMove = (e) => {
-                this.floatX = Math.max(0, Math.min(window.innerWidth  - this.floatWidth,  e.clientX - originX));
-                this.floatY = Math.max(54, Math.min(window.innerHeight - 60,               e.clientY - originY));
-            };
-            const onUp = () => {
-                document.removeEventListener('mousemove', onMove);
-                document.removeEventListener('mouseup', onUp);
-            };
-            document.addEventListener('mousemove', onMove);
-            document.addEventListener('mouseup', onUp);
+            this._dragStart('grabbing', () => {
+                return (e) => {
+                    this.floatX = Math.max(0, Math.min(window.innerWidth  - this.floatWidth,  e.clientX - originX));
+                    this.floatY = Math.max(54, Math.min(window.innerHeight - 60,               e.clientY - originY));
+                };
+            });
         },
 
         startResize(e) {
             const pos = this.dockPosition;
+            const cursors = { bottom: 'ns-resize', top: 'ns-resize', left: 'ew-resize', right: 'ew-resize', detached: 'nwse-resize' };
 
             if (pos === 'detached') {
                 const startX = e.clientX, startY = e.clientY;
                 const startW = this.floatWidth, startH = this.floatHeight;
-                const onMove = (e) => {
+                this._dragStart(cursors[pos], () => (e) => {
                     this.floatWidth  = Math.max(300, Math.min(window.innerWidth  * 0.85, startW + (e.clientX - startX)));
                     this.floatHeight = Math.max(200, Math.min(window.innerHeight * 0.85, startH + (e.clientY - startY)));
-                };
-                const onUp = () => {
-                    document.removeEventListener('mousemove', onMove);
-                    document.removeEventListener('mouseup', onUp);
-                };
-                document.addEventListener('mousemove', onMove);
-                document.addEventListener('mouseup', onUp);
+                });
                 return;
             }
 
             const isVertical = pos === 'top' || pos === 'bottom';
             const startPos  = isVertical ? e.clientY : e.clientX;
             const startSize = isVertical ? this.floatHeight : this.floatWidth;
-            const onMove = (e) => {
+            this._dragStart(cursors[pos], () => (e) => {
                 const current = isVertical ? e.clientY : e.clientX;
-                const delta = (pos === 'bottom' || pos === 'right')
-                    ? startPos - current
-                    : current - startPos;
+                const delta   = (pos === 'bottom' || pos === 'right') ? startPos - current : current - startPos;
                 if (isVertical) {
                     this.floatHeight = Math.max(160, Math.min(window.innerHeight * 0.85, startSize + delta));
                 } else {
-                    this.floatWidth = Math.max(200, Math.min(window.innerWidth * 0.7, startSize + delta));
+                    this.floatWidth  = Math.max(200, Math.min(window.innerWidth  * 0.70,  startSize + delta));
                 }
-            };
+            });
+        },
+
+        _dragStart(cursor, makeOnMove) {
+            // Lock selection and cursor for the entire drag so fast mouse movement
+            // doesn't break the feel when the pointer leaves the handle element
+            document.body.style.userSelect = 'none';
+            document.body.style.cursor     = cursor;
+
+            // Prevent CodeMirror from stealing pointer events during drag
+            const editorEl = this.$refs.cssEditorFloatMount;
+            if (editorEl) editorEl.style.pointerEvents = 'none';
+
+            const onMove = makeOnMove();
+
             const onUp = () => {
+                document.body.style.userSelect = '';
+                document.body.style.cursor     = '';
+                if (editorEl) editorEl.style.pointerEvents = '';
                 document.removeEventListener('mousemove', onMove);
-                document.removeEventListener('mouseup', onUp);
+                document.removeEventListener('mouseup',  onUp);
             };
+
             document.addEventListener('mousemove', onMove);
-            document.addEventListener('mouseup', onUp);
+            document.addEventListener('mouseup',  onUp);
         },
 
         async buildCss() {
