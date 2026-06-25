@@ -35,7 +35,6 @@ class StylesManager
         return [
             'css'                => '',
             'preview_stylesheet' => '',
-            'tailwind_output'    => false,
         ];
     }
 
@@ -46,17 +45,12 @@ class StylesManager
         }
         request()->attributes->set('fp_styles_rendered', true);
 
-        $styles = static::get();
-        $css    = trim($styles['css'] ?? '');
+        $css = trim(static::get()['css'] ?? '');
 
         if ($css === '') {
             return '';
         }
 
-        $tag = ($styles['tailwind_output'] ?? false) ? 'text/tailwindcss' : null;
-
-        return $tag
-            ? '<style type="' . $tag . '">' . $css . '</style>'
-            : '<style>' . $css . '</style>';
+        return '<style>' . $css . '</style>';
     }
 }

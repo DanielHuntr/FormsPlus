@@ -12,10 +12,13 @@
                         <div class="fst__group-title-row">
                             <span class="fst__group-title fst__group-title--bare">Preset themes</span>
                             <div class="fst__mode-toggle">
-                                <button class="fst__mode-btn" :class="{ 'fst__mode-btn--active': cssMode === 'plain' }" @click="cssMode = 'plain'" title="Load presets as plain CSS">Plain CSS</button>
-                                <button class="fst__mode-btn" :class="{ 'fst__mode-btn--active': cssMode === 'tailwind' }" @click="cssMode = 'tailwind'" title="Load presets using Tailwind @apply">Tailwind</button>
+                                <button class="fst__mode-btn" :class="{ 'fst__mode-btn--active': cssMode === 'plain' }" @click="cssMode = 'plain'" title="Plain CSS — works everywhere, no build step needed">Plain CSS</button>
+                                <button class="fst__mode-btn" :class="{ 'fst__mode-btn--active': cssMode === 'tailwind' }" @click="cssMode = 'tailwind'" title="@apply syntax — copy into your Tailwind source CSS and run through your build pipeline">Tailwind ref</button>
                             </div>
                         </div>
+                        <p v-if="cssMode === 'tailwind'" class="fst__hint fst__hint--warn">
+                            <strong>@apply does not work at runtime.</strong> Use this as a reference to copy into your site's CSS source file and process through your Tailwind build pipeline. For direct use, switch to Plain CSS.
+                        </p>
                         <div class="fst__presets">
                             <button
                                 v-for="preset in presets"
@@ -34,20 +37,6 @@
                         <input v-model="styles.preview_stylesheet" type="text" class="fst__input" placeholder="e.g. /css/site.css" @input="debouncedRefresh">
                     </div>
 
-                    <!-- Tailwind output toggle -->
-                    <div class="fst__group">
-                        <label class="fst__toggle-row">
-                            <div class="fst__toggle-switch">
-                                <input type="checkbox" v-model="styles.tailwind_output" class="fst__toggle-input">
-                                <span class="fst__toggle-track"></span>
-                            </div>
-                            <div>
-                                <div class="fst__toggle-label">Output as <code>type="text/tailwindcss"</code></div>
-                                <p class="fst__hint" style="margin-top:2px">Enable if your site loads the <strong>Tailwind Play CDN</strong>. This lets <code>@apply</code> work on the live site. Do not enable for PostCSS builds or sites without Tailwind — the style block will be silently ignored by the browser.</p>
-                            </div>
-                        </label>
-                    </div>
-
                     <!-- CSS editor -->
                     <div class="fst__group">
                         <div class="fst__group-title-row">
@@ -57,7 +46,7 @@
                                 <svg v-else xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/></svg>
                             </button>
                         </div>
-                        <p class="fst__hint">Plain CSS always works. <code>@apply</code> is supported if Tailwind is loaded on your site. Click a class chip to insert a selector at your cursor.</p>
+                        <p class="fst__hint">Write plain CSS — it is output directly into a <code>&lt;style&gt;</code> tag on every page with a form. <code>@apply</code> will not work here; use Plain CSS presets instead. Click a class chip to insert a selector.</p>
 
                         <div v-show="docked" ref="cssEditorMount" class="fst__css-editor"></div>
                         <div v-if="!docked" class="fst__css-editor-placeholder">
@@ -537,7 +526,6 @@ export default {
             styles: {
                 css:                '',
                 preview_stylesheet: '',
-                tailwind_output:    false,
             },
             presets: PRESETS,
             availableClasses: [
