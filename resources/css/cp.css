@@ -809,6 +809,110 @@
 }
 .fst__textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px #bfdbfe; }
 
+/* ── CSS editor group title row ── */
+.fst__group-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--color-grey-15, #f0f0f0);
+    margin-bottom: 10px;
+}
+.fst__group-title--bare {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+.fst__css-dock-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--color-grey-40, #9ca3af);
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+.fst__css-dock-btn:hover { background: var(--color-grey-10, #f3f4f6); color: var(--color-grey-70, #374151); }
+
+/* ── CodeMirror container (docked) ── */
+.fst__css-editor {
+    border: 1px solid var(--color-grey-25, #d1d5db);
+    border-radius: 6px;
+    overflow: hidden;
+    height: 260px;
+    margin-bottom: 10px;
+}
+.fst__css-editor .cm-editor { height: 100%; }
+.fst__css-editor .cm-scroller { overflow: auto; }
+
+/* ── Placeholder shown when editor is undocked ── */
+.fst__css-editor-placeholder {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 52px;
+    padding: 0 12px;
+    margin-bottom: 10px;
+    border: 1px dashed var(--color-grey-25, #d1d5db);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: var(--color-grey-40, #9ca3af);
+}
+
+/* ── Float panel (undocked, fixed bottom) ── */
+.fst__css-float {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 340px;
+    display: flex;
+    flex-direction: column;
+    background: #1e1e1e;
+    border-top: 2px solid #3b82f6;
+    box-shadow: 0 -8px 32px rgba(0,0,0,.4);
+    z-index: 9500;
+}
+.fst__css-float-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: #252526;
+    border-bottom: 1px solid #383838;
+    flex-shrink: 0;
+}
+.fst__css-float-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #cccccc;
+}
+.fst__css-float-dock-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #a0a0a0;
+    background: #3a3a3a;
+    border: 1px solid #555;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background .1s, color .1s;
+}
+.fst__css-float-dock-btn:hover { background: #4a4a4a; color: #eeeeee; }
+.fst__css-float-body { flex: 1; overflow: hidden; }
+.fst__css-float-body .cm-editor { height: 100%; }
+.fst__css-float-body .cm-scroller { overflow: auto; }
+
 .fst__presets { display: flex; flex-wrap: wrap; gap: 6px; }
 .fst__preset-btn {
     padding: 5px 12px;
@@ -1122,6 +1226,13 @@
 /* ── Class ref chips ── */
 .dark .fst__class-chip { background: #27272a; border-color: #3f3f46; color: #818cf8; }
 .dark .fst__class-chip:hover { background: #312e81; border-color: #4338ca; }
+
+/* ── CSS editor ── */
+.dark .fst__css-dock-btn { color: #71717a; }
+.dark .fst__css-dock-btn:hover { background: #3f3f46; color: #d4d4d8; }
+.dark .fst__css-editor { border-color: #3f3f46; }
+.dark .fst__css-editor-placeholder { border-color: #3f3f46; color: #52525b; }
+.dark .fst__group-title-row { border-color: #3f3f46; }
 
 /* ── Mail settings ── */
 .dark .ff-mail__test-msg--ok { color: #4ade80; }

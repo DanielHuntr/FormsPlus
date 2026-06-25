@@ -59,17 +59,21 @@
 
                     <!-- Custom CSS -->
                     <div class="fst__group">
-                        <div class="fst__group-title">Custom CSS</div>
+                        <div class="fst__group-title-row">
+                            <span class="fst__group-title fst__group-title--bare">Custom CSS</span>
+                            <button class="fst__css-dock-btn" @click="toggleDock" :title="docked ? 'Undock editor' : 'Dock editor'">
+                                <svg v-if="docked" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                                <svg v-else xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/></svg>
+                            </button>
+                        </div>
                         <p class="fst__hint">Injected as a <code>&lt;style&gt;</code> block on the page. Click a class below to insert a rule at your cursor.</p>
-                        <textarea
-                            ref="customCss"
-                            v-model="styles.custom_css"
-                            class="fst__textarea"
-                            rows="8"
-                            placeholder=".flexible-form__input {&#10;  border: 1px solid #d1d5db;&#10;}"
-                            @input="debouncedRefresh"
-                            spellcheck="false"
-                        ></textarea>
+
+                        <div v-show="docked" ref="cssEditorMount" class="fst__css-editor"></div>
+                        <div v-if="!docked" class="fst__css-editor-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                            Editor undocked — editing in panel below
+                        </div>
+
                         <div class="fst__class-ref">
                             <p class="fst__class-ref-hint">Available classes — hover for details, click to insert:</p>
                             <div class="fst__class-chips">
@@ -125,10 +129,30 @@
                 ></iframe>
             </div>
         </div>
+        <!-- Undocked float panel -->
+        <div v-if="!loading && !docked" class="fst__css-float">
+            <div class="fst__css-float-header">
+                <div class="fst__css-float-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    Custom CSS
+                </div>
+                <button class="fst__css-float-dock-btn" @click="toggleDock">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/></svg>
+                    Dock
+                </button>
+            </div>
+            <div ref="cssEditorFloatMount" class="fst__css-float-body"></div>
+        </div>
     </div>
 </template>
 
 <script>
+import { EditorView } from '@codemirror/view';
+import { EditorState } from '@codemirror/state';
+import { basicSetup } from 'codemirror';
+import { css as cssLang } from '@codemirror/lang-css';
+import { oneDark } from '@codemirror/theme-one-dark';
+
 const PRESETS = [
     {
         id: 'default',
@@ -243,7 +267,8 @@ export default {
     data() {
         return {
             loading:      true,
-            saving: false,
+            saving:       false,
+            docked:       true,
             previewMode:  'light',
             previewHtml:  '',
             styles: {
@@ -283,8 +308,11 @@ export default {
             //
         } finally {
             this.loading = false;
-            this.$nextTick(() => this.refreshPreview());
         }
+        await this.$nextTick();
+        this.createEditor(this.$refs.cssEditorMount);
+        this.refreshPreview();
+
         this._onSave = (e) => {
             if ((e.metaKey || e.ctrlKey) && e.key === 's') {
                 e.preventDefault();
@@ -296,11 +324,53 @@ export default {
 
     beforeUnmount() {
         document.removeEventListener('keydown', this._onSave);
+        this.editorView?.destroy();
     },
 
     methods: {
+        createEditor(container) {
+            if (!container) return;
+            const cpIsDark = document.documentElement.classList.contains('dark');
+            const extensions = [
+                basicSetup,
+                cssLang(),
+                EditorView.updateListener.of(update => {
+                    if (update.docChanged) {
+                        this.styles.custom_css = update.state.doc.toString();
+                        this.debouncedRefresh();
+                    }
+                }),
+                EditorView.theme({
+                    '&': { fontSize: '12.5px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' },
+                }),
+            ];
+            if (!this.docked || cpIsDark) extensions.push(oneDark);
+            this.editorView = new EditorView({
+                state: EditorState.create({ doc: this.styles.custom_css || '', extensions }),
+                parent: container,
+            });
+        },
+
+        async toggleDock() {
+            if (this.editorView) {
+                this.styles.custom_css = this.editorView.state.doc.toString();
+                this.editorView.destroy();
+                this.editorView = null;
+            }
+            this.docked = !this.docked;
+            await this.$nextTick();
+            this.createEditor(this.docked ? this.$refs.cssEditorMount : this.$refs.cssEditorFloatMount);
+        },
+
         applyPreset(preset) {
             this.styles = { ...preset.styles };
+            if (this.editorView) {
+                const current = this.editorView.state.doc.toString();
+                const next = this.styles.custom_css || '';
+                if (current !== next) {
+                    this.editorView.dispatch({ changes: { from: 0, to: current.length, insert: next } });
+                }
+            }
             this.refreshPreview();
         },
 
@@ -418,17 +488,18 @@ ${formHtml}
         },
 
         insertClass(className) {
-            const el = this.$refs.customCss;
-            const start = el.selectionStart;
-            const current = this.styles.custom_css || '';
-            const prefix = current.length > 0 && !current.endsWith('\n') ? '\n\n' : '';
+            if (!this.editorView) return;
+            const state = this.editorView.state;
+            const from = state.selection.main.head;
+            const before = state.doc.sliceString(0, from);
+            const prefix = before.length > 0 && !before.endsWith('\n') ? '\n\n' : '';
             const snippet = `${prefix}.${className} {\n  \n}`;
-            this.styles.custom_css = current.slice(0, start) + snippet + current.slice(el.selectionEnd);
-            this.$nextTick(() => {
-                const cursorPos = start + prefix.length + `.${className} {\n  `.length;
-                el.focus();
-                el.setSelectionRange(cursorPos, cursorPos);
+            const newCursor = from + prefix.length + `.${className} {\n  `.length;
+            this.editorView.dispatch({
+                changes: { from, insert: snippet },
+                selection: { anchor: newCursor },
             });
+            this.editorView.focus();
             this.debouncedRefresh();
         },
 
