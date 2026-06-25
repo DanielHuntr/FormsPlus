@@ -545,7 +545,8 @@ export default {
                 css:                '',
                 preview_stylesheet: '',
             },
-            cssFiles:       [],
+            cssFiles:                [],
+            previewStylesheetContent: '',
             presets: PRESETS,
             availableClasses: [
                 { name: 'flexible-form',               description: 'The <form> element' },
@@ -566,6 +567,12 @@ export default {
                 { name: 'flexible-form__submit',       description: 'Submit button wrapper div' },
             ],
         };
+    },
+
+    watch: {
+        'styles.preview_stylesheet'(url) {
+            this.fetchPreviewStylesheet(url);
+        },
     },
 
     computed: {
@@ -610,6 +617,7 @@ export default {
         }
         await this.$nextTick();
         this.createEditor(this.$refs.cssEditorMount);
+        await this.fetchPreviewStylesheet(this.styles.preview_stylesheet);
         this.refreshPreview();
     },
 
@@ -732,7 +740,7 @@ export default {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.tailwindcss.com"><\/script>
 <script>tailwind.config = { darkMode: 'class' }<\/script>
-${s.preview_stylesheet ? `<link rel="stylesheet" href="${s.preview_stylesheet}">` : ''}
+${this.previewStylesheetContent ? `<style>${this.previewStylesheetContent}</style>` : ''}
 <style>
 * { box-sizing: border-box; }
 body { padding: 28px; background: ${bodyBg}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
@@ -766,6 +774,30 @@ ${formHtml}
             });
             this.editorView.focus();
             this.debouncedRefresh();
+        },
+
+        async fetchPreviewStylesheet(url) {
+            if (!url) {
+                this.previewStylesheetContent = '';
+                return;
+            }
+            try {
+                const res = await fetch(url);
+                const text = await res.text();
+                this.previewStylesheetContent = this.processPreviewStylesheet(text);
+            } catch {
+                this.previewStylesheetContent = '';
+            }
+            this.debouncedRefresh();
+        },
+
+        processPreviewStylesheet(css) {
+            // Strip Tailwind-specific imports the browser can't resolve
+            let out = css.replace(/@import\s+["']tailwindcss["'][^;]*;/g, '');
+            out = out.replace(/@(?:source|plugin)\s+[^{;]*(?:\{[^}]*\}|;)/g, '');
+            // Convert Tailwind v4 @theme { } → :root { } so CSS custom props resolve in browser
+            out = out.replace(/@theme(?:\s+\w+)?\s*\{([\s\S]*?)\}/g, (_, block) => ':root {' + block + '}');
+            return out;
         },
 
         setDockPosition(pos) {
