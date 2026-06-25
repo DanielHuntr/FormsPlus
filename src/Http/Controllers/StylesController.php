@@ -23,19 +23,7 @@ class StylesController extends CpController
     public function save(Request $request)
     {
         $request->validate([
-            'form'         => 'nullable|string|max:2000',
-            'wrapper'      => 'nullable|string|max:2000',
-            'label'        => 'nullable|string|max:2000',
-            'input'        => 'nullable|string|max:2000',
-            'textarea'     => 'nullable|string|max:2000',
-            'select'       => 'nullable|string|max:2000',
-            'checkbox'     => 'nullable|string|max:2000',
-            'radio'        => 'nullable|string|max:2000',
-            'choice_label' => 'nullable|string|max:2000',
-            'button'       => 'nullable|string|max:2000',
-            'error'        => 'nullable|string|max:2000',
-            'hint'         => 'nullable|string|max:2000',
-            'custom_css'         => 'nullable|string|max:20000',
+            'css'                => 'nullable|string|max:50000',
             'preview_stylesheet' => 'nullable|url|max:500',
         ]);
 

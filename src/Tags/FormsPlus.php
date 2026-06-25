@@ -32,7 +32,6 @@ class FormsPlus extends Tags
             'errorRedirect' => $this->params->get('error_redirect', ''),
             'submitLabel'   => $this->params->get('submit_label') ?: $settings['submit_label'] ?? 'Submit',
             'settings'      => $settings,
-            'styles'        => StylesManager::get(),
             'submitted'     => $submitted,
         ])->render();
     }

@@ -3,7 +3,6 @@
 namespace App\FormsPlus\Http\Controllers;
 
 use App\FormsPlus\SettingsManager;
-use App\FormsPlus\StylesManager;
 use Illuminate\Routing\Controller;
 use Statamic\Facades\Form;
 
@@ -71,9 +70,8 @@ class PublicFormController extends Controller
             'redirect'      => $redirect,
             'errorRedirect' => request('error_redirect', ''),
             'submitLabel'   => request('submit_label') ?: $settings['submit_label'] ?? 'Submit',
-            'settings'      => $settings,
-            'styles'        => StylesManager::get(),
-            'submitted'     => $submitted,
+            'settings'  => $settings,
+            'submitted' => $submitted,
         ]);
     }
 

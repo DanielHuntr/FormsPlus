@@ -1,19 +1,12 @@
 @php
     $settings    = $settings ?? [];
-    $styles      = $styles ?? [];
     $submitted   = $submitted ?? false;
     $enabled     = $settings['enabled'] ?? true;
     $submitLabel = $submitLabel ?? $settings['submit_label'] ?? 'Submit';
     $hasFile     = $fields->contains('type', 'files');
-
-    // Class helpers — merge BEM class with any custom classes
-    $cls = fn(string $base, string $key) => trim($base . ' ' . ($styles[$key] ?? ''));
 @endphp
 
-{{-- Inject custom CSS (scoped to this form's wrapper) --}}
-@if (!empty($styles['custom_css']))
-<style>{{ $styles['custom_css'] }}</style>
-@endif
+{!! \App\FormsPlus\StylesManager::renderStyles() !!}
 
 {{-- Success state --}}
 @if ($submitted)
@@ -34,7 +27,7 @@
     <form
         action="{{ $actionUrl }}"
         method="POST"
-        class="{{ $cls('flexible-form', 'form') }}"
+        class="flexible-form"
         @if ($hasFile) enctype="multipart/form-data" @endif
     >
         @csrf
@@ -60,13 +53,13 @@
             @foreach ($fields as $field)
                 @php
                     $hasError     = $errors->has($field['handle']);
-                    $wrapperClass = $cls('flexible-form__field', 'wrapper') . ($hasError ? ' flexible-form__field--error' : '');
-                    $inputClass   = $cls('flexible-form__input', 'input') . ($hasError ? ' flexible-form__input--error' : '');
+                    $wrapperClass = 'flexible-form__field' . ($hasError ? ' flexible-form__field--error' : '');
+                    $inputClass   = 'flexible-form__input' . ($hasError ? ' flexible-form__input--error' : '');
                 @endphp
 
                 <div class="{{ $wrapperClass }}" style="--field-width: {{ $field['width'] ?? 100 }}%">
                     @if (! in_array($field['type'], ['checkboxes', 'radio']))
-                        <label class="{{ $cls('flexible-form__label', 'label') }}" for="{{ $field['handle'] }}">
+                        <label class="flexible-form__label" for="{{ $field['handle'] }}">
                             {!! $field['display'] !!}
                             @if ($field['required'])
                                 <span class="flexible-form__required" aria-hidden="true">*</span>
@@ -75,7 +68,7 @@
                     @endif
 
                     @if (! empty($field['instructions']))
-                        <p class="{{ $cls('flexible-form__instructions', 'hint') }}">{{ $field['instructions'] }}</p>
+                        <p class="flexible-form__instructions">{{ $field['instructions'] }}</p>
                     @endif
 
                     @switch($field['type'])
@@ -96,7 +89,7 @@
                             <textarea
                                 name="{{ $field['handle'] }}"
                                 id="{{ $field['handle'] }}"
-                                class="{{ $cls('flexible-form__input flexible-form__textarea', 'textarea') }}{{ $hasError ? ' flexible-form__input--error' : '' }}"
+                                class="flexible-form__input flexible-form__textarea{{ $hasError ? ' flexible-form__input--error' : '' }}"
                                 placeholder="{{ $field['placeholder'] ?? '' }}"
                                 rows="{{ $field['rows'] ?? 3 }}"
                                 @if (! empty($field['character_limit'])) maxlength="{{ $field['character_limit'] }}" @endif
@@ -108,7 +101,7 @@
                             <select
                                 name="{{ $field['handle'] }}{{ ($field['multiple'] ?? false) ? '[]' : '' }}"
                                 id="{{ $field['handle'] }}"
-                                class="{{ $cls('flexible-form__input flexible-form__select', 'select') }}{{ $hasError ? ' flexible-form__input--error' : '' }}"
+                                class="flexible-form__input flexible-form__select{{ $hasError ? ' flexible-form__input--error' : '' }}"
                                 @if ($field['multiple'] ?? false) multiple @endif
                                 @if ($field['required']) required @endif
                             >
@@ -121,23 +114,23 @@
 
                         @case('checkboxes')
                             <fieldset class="flexible-form__fieldset">
-                                <legend class="{{ $cls('flexible-form__label', 'label') }}">
+                                <legend class="flexible-form__label">
                                     {!! $field['display'] !!}
                                     @if ($field['required'])
                                         <span class="flexible-form__required" aria-hidden="true">*</span>
                                     @endif
                                 </legend>
                                 @if (! empty($field['instructions']))
-                                    <p class="{{ $cls('flexible-form__instructions', 'hint') }}">{{ $field['instructions'] }}</p>
+                                    <p class="flexible-form__instructions">{{ $field['instructions'] }}</p>
                                 @endif
                                 <div class="flexible-form__check-group">
                                     @foreach ($field['options'] as $value => $label)
-                                        <label class="{{ $cls('flexible-form__check-label', 'choice_label') }}">
+                                        <label class="flexible-form__check-label">
                                             <input
                                                 type="checkbox"
                                                 name="{{ $field['handle'] }}[]"
                                                 value="{{ $value }}"
-                                                class="{{ $cls('flexible-form__checkbox', 'checkbox') }}"
+                                                class="flexible-form__checkbox"
                                                 @checked(in_array((string) $value, (array) old($field['handle'], [])))
                                             >
                                             {{ $label }}
@@ -149,23 +142,23 @@
 
                         @case('radio')
                             <fieldset class="flexible-form__fieldset">
-                                <legend class="{{ $cls('flexible-form__label', 'label') }}">
+                                <legend class="flexible-form__label">
                                     {!! $field['display'] !!}
                                     @if ($field['required'])
                                         <span class="flexible-form__required" aria-hidden="true">*</span>
                                     @endif
                                 </legend>
                                 @if (! empty($field['instructions']))
-                                    <p class="{{ $cls('flexible-form__instructions', 'hint') }}">{{ $field['instructions'] }}</p>
+                                    <p class="flexible-form__instructions">{{ $field['instructions'] }}</p>
                                 @endif
                                 <div class="flexible-form__check-group">
                                     @foreach ($field['options'] as $value => $label)
-                                        <label class="{{ $cls('flexible-form__check-label', 'choice_label') }}">
+                                        <label class="flexible-form__check-label">
                                             <input
                                                 type="radio"
                                                 name="{{ $field['handle'] }}"
                                                 value="{{ $value }}"
-                                                class="{{ $cls('flexible-form__radio', 'radio') }}"
+                                                class="flexible-form__radio"
                                                 @checked(old($field['handle']) === (string) $value)
                                                 @if ($field['required']) required @endif
                                             >
@@ -192,7 +185,7 @@
                     @endswitch
 
                     @error($field['handle'])
-                        <p class="{{ $cls('flexible-form__error-msg', 'error') }}" role="alert">{{ $message }}</p>
+                        <p class="flexible-form__error-msg" role="alert">{{ $message }}</p>
                     @enderror
                 </div>
             @endforeach
@@ -204,7 +197,7 @@
         </div>
 
         <div class="flexible-form__submit">
-            <button type="submit" class="{{ $cls('flexible-form__button', 'button') }}">
+            <button type="submit" class="flexible-form__button">
                 {{ $submitLabel }}
             </button>
         </div>

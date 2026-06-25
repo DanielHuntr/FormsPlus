@@ -33,20 +33,24 @@ class StylesManager
     public static function defaults(): array
     {
         return [
-            'form'         => '',
-            'wrapper'      => '',
-            'label'        => '',
-            'input'        => '',
-            'textarea'     => '',
-            'select'       => '',
-            'checkbox'     => '',
-            'radio'        => '',
-            'choice_label' => '',
-            'button'       => '',
-            'error'        => '',
-            'hint'         => '',
-            'custom_css'          => '',
-            'preview_stylesheet'  => '',
+            'css'                => '',
+            'preview_stylesheet' => '',
         ];
+    }
+
+    public static function renderStyles(): string
+    {
+        if (request()->attributes->get('fp_styles_rendered')) {
+            return '';
+        }
+        request()->attributes->set('fp_styles_rendered', true);
+
+        $css = trim(static::get()['css'] ?? '');
+
+        if ($css === '') {
+            return '';
+        }
+
+        return '<style>' . $css . '</style>';
     }
 }

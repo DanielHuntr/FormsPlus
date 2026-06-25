@@ -79,9 +79,8 @@ class FormsPlusFieldtype extends Fieldtype
             'redirect'      => $redirect,
             'errorRedirect' => '',
             'submitLabel'   => $settings['submit_label'] ?? 'Submit',
-            'settings'      => $settings,
-            'styles'        => StylesManager::get(),
-            'submitted'     => $submitted,
+            'settings'  => $settings,
+            'submitted' => $submitted,
         ])->render();
     }
 
