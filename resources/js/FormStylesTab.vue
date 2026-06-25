@@ -525,9 +525,10 @@ let refreshTimer = null;
 
 export default {
     props: {
-        stylesUrl:    { type: String, required: true },
+        stylesUrl:     { type: String, required: true },
         stylesSaveUrl: { type: String, required: true },
-        cssFilesUrl:  { type: String, required: true },
+        cssFilesUrl:   { type: String, required: true },
+        cssContentUrl: { type: String, required: true },
     },
 
     data() {
@@ -781,10 +782,17 @@ ${formHtml}
                 this.previewStylesheetContent = '';
                 return;
             }
+            // Find the matching file label (relative path within resources/css)
+            const file = this.cssFiles.find(f => f.url === url);
+            if (!file) {
+                this.previewStylesheetContent = '';
+                return;
+            }
             try {
-                const res = await fetch(url);
-                const text = await res.text();
-                this.previewStylesheetContent = this.processPreviewStylesheet(text);
+                const { data } = await this.$axios.get(
+                    this.cssContentUrl + '?file=' + encodeURIComponent(file.label)
+                );
+                this.previewStylesheetContent = this.processPreviewStylesheet(data);
             } catch {
                 this.previewStylesheetContent = '';
             }

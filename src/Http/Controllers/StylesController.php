@@ -21,6 +21,18 @@ class StylesController extends CpController
         return response()->json(StylesManager::get());
     }
 
+    public function cssFileContent(Request $request)
+    {
+        $dir  = realpath(resource_path('css'));
+        $path = realpath($dir . DIRECTORY_SEPARATOR . $request->query('file', ''));
+
+        if (! $path || ! str_starts_with($path, $dir . DIRECTORY_SEPARATOR) || ! File::isFile($path)) {
+            return response('/* file not found */', 404, ['Content-Type' => 'text/css']);
+        }
+
+        return response(File::get($path), 200, ['Content-Type' => 'text/css']);
+    }
+
     public function cssFiles()
     {
         $dir = resource_path('css');

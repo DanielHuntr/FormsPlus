@@ -30,6 +30,7 @@ Route::prefix('forms-plus')->name('forms-plus.')->group(function () {
     Route::get('/theme/api', [StylesController::class, 'show'])->name('styles.api');
     Route::post('/theme/api', [StylesController::class, 'save'])->name('styles.save');
     Route::get('/theme/css-files', [StylesController::class, 'cssFiles'])->name('styles.css-files');
+    Route::get('/theme/css-content', [StylesController::class, 'cssFileContent'])->name('styles.css-content');
 
     Route::get('/{handle}/preview', [FormsController::class, 'preview'])->name('preview');
     Route::get('/{handle}/edit', [FormsController::class, 'edit'])->name('edit');

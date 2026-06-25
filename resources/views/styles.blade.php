@@ -6,5 +6,6 @@
         styles-url="{{ $stylesApiUrl }}"
         styles-save-url="{{ $stylesApiUrl }}"
         css-files-url="{{ cp_route('forms-plus.styles.css-files') }}"
+        css-content-url="{{ cp_route('forms-plus.styles.css-content') }}"
     ></forms-plus-styles>
 @endsection
