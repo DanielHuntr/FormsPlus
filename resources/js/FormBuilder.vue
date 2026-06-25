@@ -101,6 +101,29 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Submit button node — always pinned at the bottom of the canvas -->
+                <div
+                    class="ff-submit-node"
+                    :class="{ 'ff-submit-node--active': submitBtnActive }"
+                    @click="openSubmitBtn"
+                >
+                    <div class="ff-submit-node__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </div>
+                    <div class="ff-submit-node__info">
+                        <span class="ff-submit-node__label">{{ submitBtn.submit_label || 'Submit' }}</span>
+                        <span class="ff-submit-node__meta">
+                            <template v-if="submitBtn.on_submit === 'redirect'">
+                                Redirects to {{ submitBtn.redirect_url || '(no URL set)' }}
+                            </template>
+                            <template v-else>
+                                Shows success message
+                            </template>
+                        </span>
+                    </div>
+                    <span class="ff-submit-node__badge">Submit Button</span>
+                </div>
             </main>
 
             <!-- Field editor panel -->
@@ -110,6 +133,60 @@
                     @update="updateActiveField"
                     @close="activeIndex = null"
                 />
+            </aside>
+
+            <!-- Submit button editor panel -->
+            <aside class="ff-editor-panel" v-else-if="submitBtnActive">
+                <div class="ff-editor">
+                    <div class="ff-editor__header">
+                        <h3 class="ff-editor__title">Submit Button</h3>
+                        <button class="ff-editor__close" @click="submitBtnActive = false" aria-label="Close panel">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </div>
+                    <div class="ff-editor__body">
+
+                        <div class="ff-field">
+                            <label class="ff-label">Button label</label>
+                            <input v-model="submitBtn.submit_label" type="text" class="ff-input" placeholder="Submit">
+                        </div>
+
+                        <h4 class="ff-editor__section-title">After Submission</h4>
+
+                        <div class="ff-field">
+                            <div class="ff-settings__radio-group" style="display:flex;flex-direction:column;gap:0.5rem;">
+                                <label class="ff-settings__radio-label">
+                                    <input type="radio" v-model="submitBtn.on_submit" value="message">
+                                    Show a success message
+                                </label>
+                                <label class="ff-settings__radio-label">
+                                    <input type="radio" v-model="submitBtn.on_submit" value="redirect">
+                                    Redirect to a page
+                                </label>
+                            </div>
+                        </div>
+
+                        <template v-if="submitBtn.on_submit === 'message'">
+                            <div class="ff-field">
+                                <label class="ff-label">Success title</label>
+                                <input v-model="submitBtn.success_title" type="text" class="ff-input" placeholder="Message sent!">
+                            </div>
+                            <div class="ff-field">
+                                <label class="ff-label">Success message</label>
+                                <textarea v-model="submitBtn.success_message" class="ff-input ff-input--textarea" rows="3" placeholder="Thank you for getting in touch…"></textarea>
+                            </div>
+                        </template>
+
+                        <template v-if="submitBtn.on_submit === 'redirect'">
+                            <div class="ff-field">
+                                <label class="ff-label">Redirect URL</label>
+                                <input v-model="submitBtn.redirect_url" type="text" class="ff-input" placeholder="https://example.com/page?ref=signup">
+                                <p class="ff-hint">Full URLs with query parameters are supported, e.g. <code>?email=user@example.com</code>.</p>
+                            </div>
+                        </template>
+
+                    </div>
+                </div>
             </aside>
         </div>
 
@@ -266,8 +343,16 @@ export default {
         const form = JSON.parse(this.formJson || '{}');
         return {
             form,
-            fields:        [],
-            activeIndex:   null,
+            fields:          [],
+            activeIndex:     null,
+            submitBtnActive: false,
+            submitBtn: {
+                submit_label:    'Submit',
+                on_submit:       'message',
+                success_title:   'Message sent!',
+                success_message: "Thank you for getting in touch. We'll be in touch soon.",
+                redirect_url:    '',
+            },
             saving:        false,
             isDirty:       false,
             loading:       true,
@@ -305,7 +390,7 @@ export default {
     },
 
     async mounted() {
-        await this.loadFields();
+        await Promise.all([this.loadFields(), this.loadSubmitBtn()]);
         this._fieldsLoaded = true;
 
         this._onSave = (e) => {
@@ -340,6 +425,16 @@ export default {
                 console.error('Failed to load fields.');
             } finally {
                 this.loading = false;
+            }
+        },
+
+        async loadSubmitBtn() {
+            try {
+                const { data } = await this.$axios.get(this.settingsUrl);
+                const keys = ['submit_label', 'on_submit', 'success_title', 'success_message', 'redirect_url'];
+                keys.forEach(k => { if (data[k] !== undefined) this.submitBtn[k] = data[k]; });
+            } catch {
+                // keep defaults
             }
         },
 
@@ -387,7 +482,13 @@ export default {
         },
 
         setActive(index) {
+            this.submitBtnActive = false;
             this.activeIndex = this.activeIndex === index ? null : index;
+        },
+
+        openSubmitBtn() {
+            this.activeIndex     = null;
+            this.submitBtnActive = true;
         },
 
         updateActiveField(updates) {
@@ -409,7 +510,7 @@ export default {
             try {
                 await Promise.all([
                     this.saveFields(),
-                    this.$refs.settingsPanel?.save(),
+                    this.$refs.settingsPanel?.save(this.submitBtn),
                     this.$refs.emailTab?.save(),
                 ]);
                 this.isDirty = false;

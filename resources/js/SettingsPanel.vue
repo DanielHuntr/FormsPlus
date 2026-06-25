@@ -19,56 +19,6 @@
                     </div>
                 </div>
 
-                <div class="ff-settings__row">
-                    <label class="ff-settings__label">Submit button label</label>
-                    <div class="ff-settings__control">
-                        <input v-model="form.submit_label" type="text" class="ff-input" placeholder="Submit">
-                    </div>
-                </div>
-            </section>
-
-            <!-- After submission -->
-            <section class="ff-settings__section">
-                <h3 class="ff-settings__section-title">After Submission</h3>
-
-                <div class="ff-settings__row">
-                    <label class="ff-settings__label">On success</label>
-                    <div class="ff-settings__control ff-settings__radio-group">
-                        <label class="ff-settings__radio-label">
-                            <input type="radio" v-model="form.on_submit" value="message">
-                            Show a success message
-                        </label>
-                        <label class="ff-settings__radio-label">
-                            <input type="radio" v-model="form.on_submit" value="redirect">
-                            Redirect to a page
-                        </label>
-                    </div>
-                </div>
-
-                <template v-if="form.on_submit === 'message'">
-                    <div class="ff-settings__row">
-                        <label class="ff-settings__label">Success title</label>
-                        <div class="ff-settings__control">
-                            <input v-model="form.success_title" type="text" class="ff-input" placeholder="Message sent!">
-                        </div>
-                    </div>
-                    <div class="ff-settings__row">
-                        <label class="ff-settings__label">Success message</label>
-                        <div class="ff-settings__control">
-                            <textarea v-model="form.success_message" class="ff-input ff-input--textarea" rows="3" placeholder="Thank you for getting in touch…"></textarea>
-                        </div>
-                    </div>
-                </template>
-
-                <template v-if="form.on_submit === 'redirect'">
-                    <div class="ff-settings__row">
-                        <label class="ff-settings__label">Redirect to</label>
-                        <div class="ff-settings__control">
-                            <input v-model="form.redirect_url" type="text" class="ff-input" placeholder="/thank-you">
-                            <p class="ff-hint">Enter a URL or path (e.g. <code>/thank-you</code>).</p>
-                        </div>
-                    </div>
-                </template>
             </section>
 
             <!-- Email notifications -->
@@ -145,14 +95,9 @@ export default {
             loading: true,
             saving:  false,
             form: {
-                enabled:              true,
-                submit_label:         'Submit',
-                notification_email:   '',
-                reply_to_field:       '',
-                on_submit:            'message',
-                success_title:        'Message sent!',
-                success_message:      "Thank you for getting in touch. We'll be in touch soon.",
-                redirect_url:               '',
+                enabled:                    true,
+                notification_email:         '',
+                reply_to_field:             '',
                 confirmation_email_enabled: false,
                 confirmation_email_field:   '',
             },
@@ -214,10 +159,10 @@ export default {
     },
 
     methods: {
-        async save() {
+        async save(extraData = {}) {
             this.saving = true;
             try {
-                await this.$axios.post(this.settingsSaveUrl, this.form);
+                await this.$axios.post(this.settingsSaveUrl, { ...this.form, ...extraData });
             } catch {
                 this.$toast.error('Could not save settings.');
                 throw new Error('settings save failed');
