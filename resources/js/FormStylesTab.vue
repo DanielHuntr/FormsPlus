@@ -34,6 +34,20 @@
                         <input v-model="styles.preview_stylesheet" type="text" class="fst__input" placeholder="e.g. /css/site.css" @input="debouncedRefresh">
                     </div>
 
+                    <!-- Tailwind output toggle -->
+                    <div class="fst__group">
+                        <label class="fst__toggle-row">
+                            <div class="fst__toggle-switch">
+                                <input type="checkbox" v-model="styles.tailwind_output" class="fst__toggle-input">
+                                <span class="fst__toggle-track"></span>
+                            </div>
+                            <div>
+                                <div class="fst__toggle-label">Output as <code>type="text/tailwindcss"</code></div>
+                                <p class="fst__hint" style="margin-top:2px">Enable if your site loads the <strong>Tailwind Play CDN</strong>. This lets <code>@apply</code> work on the live site. Do not enable for PostCSS builds or sites without Tailwind — the style block will be silently ignored by the browser.</p>
+                            </div>
+                        </label>
+                    </div>
+
                     <!-- CSS editor -->
                     <div class="fst__group">
                         <div class="fst__group-title-row">
@@ -523,6 +537,7 @@ export default {
             styles: {
                 css:                '',
                 preview_stylesheet: '',
+                tailwind_output:    false,
             },
             presets: PRESETS,
             availableClasses: [
